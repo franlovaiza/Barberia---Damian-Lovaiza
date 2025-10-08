@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Panel del Barbero</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        h1 { text-align: center; }
+        ul { list-style: none; padding: 0; max-width: 600px; margin: auto; }
+        li { padding: 12px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px; background: white; display: flex; justify-content: space-between; align-items: center; }
+        button { margin-left: 10px; }
+        .logout { margin: 20px auto; display: block; background: #d9534f; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+        .day-group {
+            margin-top: 20px;
+            border: 1px solid #555;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #2a2a2a;
+        }
+        .day-group h2 {
+            color: #fff;
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.5em;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+        }
+        .day-group ul {
+            max-width: none; /* Anular el max-width del ul general */
+            margin: 0;
+        }
+        .day-group li {
+            background: #3a3a3a; /* Fondo más oscuro para los items dentro del grupo */
+            color: #f5f5f5;
+            border-color: #444;
+        }
+    </style>
+</head>
+<body>
+
+    <script>
+      // Protección: redirige si no está logueado
+        if (localStorage.getItem("autenticado") !== "true") {
+        window.location.href = "login.html";
+        }
+    </script>
+
+    <h1>Panel del Barbero</h1>
+
+    <button class="logout" onclick="logout()">Cerrar sesión</button>
+
+    <div id="turnosContainer"></div> <!-- Contenedor para los grupos de días -->
+    <p id="mensajeVacio" style="text-align: center; display: none;">No hay turnos cargados.</p>
+
+    <script>
+        const turnosContainer = document.getElementById("turnosContainer");
+        const mensajeVacio = document.getElementById("mensajeVacio");
+
+        async function cargarTurnos() {
+            try {
+                const res = await fetch("http://127.0.0.1:8000/turnos/"); // Obtener todos los turnos
+                const data = await res.json();
+
+                turnosContainer.innerHTML = ""; // Limpiar el contenedor
+
+                if (data.turnos.length === 0) {
+                    mensajeVacio.style.display = "block";
+                } else {
+                    mensajeVacio.style.display = "none";
+
+                    // Agrupar turnos por fecha
+                    const turnosAgrupados = {};
+                    data.turnos.forEach(turno => {
+                        const fecha = turno[3]; // La fecha está en el índice 3
+                        if (!turnosAgrupados[fecha]) {
+                            turnosAgrupados[fecha] = [];
+                        }
+                        turnosAgrupados[fecha].push(turno);
+                    });
+
+                    // Ordenar las fechas
+                    const fechasOrdenadas = Object.keys(turnosAgrupados).sort();
+
+                    fechasOrdenadas.forEach(fecha => {
+                        const dayGroup = document.createElement("div");
+                        dayGroup.classList.add("day-group");
+
+                        const fechaObj = new Date(fecha + 'T00:00:00'); // Añadir T00:00:00 para evitar problemas de zona horaria
+                        const opcionesFecha = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                        const nombreDia = fechaObj.toLocaleDateString('es-ES', opcionesFecha);
+
+                        const h2 = document.createElement("h2");
+                        h2.textContent = nombreDia.charAt(0).toUpperCase() + nombreDia.slice(1); // Capitalizar la primera letra
+                        dayGroup.appendChild(h2);
+
+                        const ul = document.createElement("ul");
+                        
+                        // Ordenar turnos dentro del día por hora
+                        turnosAgrupados[fecha].sort((a, b) => {
+                            const horaA = new Date(`2000/01/01 ${a[4]}`);
+                            const horaB = new Date(`2000/01/01 ${b[4]}`);
+                            return horaA - horaB;
+                        });
+
+                        turnosAgrupados[fecha].forEach(turno => {
+                            const li = document.createElement("li");
+                            li.textContent = `Hora: ${turno[4]} | ${turno[1]} - Tel: ${turno[2]}`; // Mostrar hora primero
+
+                            const btnBorrar = document.createElement("button");
+                            btnBorrar.textContent = "Eliminar";
+                            btnBorrar.onclick = async () => {
+                                if (confirm("¿Seguro que querés eliminar este turno?")) {
+                                    const res = await fetch(`http://127.0.0.1:8000/turnos/${turno[0]}`, {
+                                        method: "DELETE"
+                                    });
+                                    if (res.ok) {
+                                        alert("Turno eliminado");
+                                        cargarTurnos(); // Recargar la lista
+                                    } else {
+                                        alert("Error al eliminar");
+                                    }
+                                }
+                            };
+
+                            li.appendChild(btnBorrar);
+                            ul.appendChild(li);
+                        });
+                        dayGroup.appendChild(ul);
+                        turnosContainer.appendChild(dayGroup);
+                    });
+                }
+            } catch (error) {
+                console.error("Error al cargar turnos:", error);
+                alert("No se pudo conectar con el servidor.");
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem("autenticado");
+            window.location.href = "login.html";
+        }
+
+        cargarTurnos();
+    </script>
+
+</body>
+</html>

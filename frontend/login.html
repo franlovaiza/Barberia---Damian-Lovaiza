@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Login Barbero</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background-color: #333; }
+        input { display: block; margin: 10px auto; padding: 10px; width: 200px; max-width: 90vw; }
+        button { padding: 10px 20px; }
+        .login-box {
+            border: 2px solid #333;
+            background: #222;
+            color: #fff;
+            display: inline-block;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            width: 300px;
+            max-width: 95vw;
+        }
+        @media (max-width: 500px) {
+            body { padding: 10px; }
+            .login-box { width: 100%; padding: 10px; }
+            input { width: 100%; }
+            button { width: 100%; }
+            img { max-width: 100vw; height: auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <img src="logo1.png" alt="logo" style="max-width: 90vw;"><br>
+    <div class="login-box">
+        <p>Ingresá tus datos</p>
+
+        <input type="text" id="usuario" placeholder="Usuario">
+        <input type="password" id="clave" placeholder="Contraseña">
+        <button onclick="login()" style="width: auto; min-width: 0;">Ingresar</button>
+    </div>
+
+    <p id="mensaje" style="color: red;"></p>
+
+<script>
+    function login() {
+        const usuario = document.getElementById("usuario").value;
+        const clave = document.getElementById("clave").value;
+
+        // 👇 Cambiá estos datos por los que quieras
+        const usuarioCorrecto = "damian";
+        const claveCorrecta = "barber123";
+
+        if (usuario === usuarioCorrecto && clave === claveCorrecta) {
+            localStorage.setItem("autenticado", "true");
+            window.location.href = "barbero.html";
+        } else {
+            document.getElementById("mensaje").textContent = "Usuario o contraseña incorrectos.";
+        }
+    }
+</script>
+
+</body>
+</html>
