@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, DateTime, ForeignKey, String
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from backend.db.database import Base
+from db.database import Base
 
 class Turno(Base):
     __tablename__ = "turno"
@@ -11,7 +11,7 @@ class Turno(Base):
     telefono = Column(String(15))
     tipo_turno = Column(String(25))
     fecha = Column(DateTime)
-    hora = Column(DateTime)
+    hora = Column(String(10))
     estado = Column(String(20), default="Reservado")
     observaciones = Column(String(200), nullable=True)
 

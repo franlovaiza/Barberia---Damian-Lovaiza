@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from datetime import datetime
+from datetime import date, time, datetime
 from typing import Optional
 
 class TurnoBase(BaseModel):
@@ -7,8 +7,8 @@ class TurnoBase(BaseModel):
     email: EmailStr
     telefono: str
     tipo_turno: str
-    fecha: datetime
-    hora: datetime
+    fecha: date
+    hora: time
     estado: str = "Reservado"
     observaciones: Optional[str] = None
 

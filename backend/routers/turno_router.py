@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from typing import List, Optional
-from backend.db.dependencies import get_db
-from backend.schemas.turno_schema import TurnoCreate, TurnoSchema, TurnoOut
-from backend.services.turno_service import (
+from db.dependencies import get_db
+from schemas.turno_schema import TurnoCreate, TurnoSchema, TurnoOut
+from services.turno_service import (
     get_turnos,
     get_turno,
     create_turno,

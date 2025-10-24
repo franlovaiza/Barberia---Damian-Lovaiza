@@ -271,6 +271,12 @@
         </div>
     </footer>
 
+    <script type="module">
+        import { API_URL } from './config.js'; // ruta relativa desde index.html
+        console.log(API_URL);
+        // ahora puedes usar API_URL en este script
+        window.apiUrl = API_URL;
+    </script>
     <script>
         function validarTelefono(telefono) {
     // Ejemplo: acepta solo números y debe tener entre 8 y 15 dígitos
@@ -288,8 +294,9 @@ document.getElementById('turnoForm').addEventListener('submit', function(e) {
     const nombre = this.querySelector('input[type="text"]').value.trim();
     const telefono = this.querySelector('input[type="tel"]').value.trim();
     const email = this.querySelector('input[type="email"]').value.trim();
+    const tipo_turno = this.querySelector('select').value;
     const fecha = this.querySelector('input[type="date"]').value.trim();
-    const hora = horaSeleccionada
+    const hora = `${horaSeleccionada}:00`;
 
     let mensaje = "";
     if (!nombre) mensaje += "El nombre es obligatorio.\n";
@@ -301,7 +308,9 @@ document.getElementById('turnoForm').addEventListener('submit', function(e) {
         return;
     }
 
-    fetch('http://127.0.0.1:8000/turnos/', {
+    const apiUrl = window.apiUrl;
+
+    fetch(`${apiUrl}/turnos/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -309,6 +318,8 @@ document.getElementById('turnoForm').addEventListener('submit', function(e) {
         body: JSON.stringify({
             nombre: nombre,
             telefono: telefono,
+            email: email,
+            tipo_turno: tipo_turno,
             fecha: fecha,
             hora: hora
         })
@@ -322,65 +333,88 @@ document.getElementById('turnoForm').addEventListener('submit', function(e) {
 });
     </script>
     <script>
-        // Validación del formulario
-        document.getElementById('turnoForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        // import { API_URL } from './config.js';
+        // // Validación del formulario
+        // document.getElementById('turnoForm').addEventListener('submit', function(e) {
+        //     e.preventDefault();
             
-            // Validación básica
-            const inputs = this.querySelectorAll('input[required]');
-            let isValid = true;
+        //     // Validación básica
+        //     const inputs = this.querySelectorAll('input[required]');
+        //     let isValid = true;
             
-            inputs.forEach(input => {
-                if (!input.value.trim()) {
-                    input.style.borderColor = 'red';
-                    isValid = false;
-                } else {
-                    input.style.borderColor = '#d1d5db';
-                }
-            });
+        //     inputs.forEach(input => {
+        //         if (!input.value.trim()) {
+        //             input.style.borderColor = 'red';
+        //             isValid = false;
+        //         } else {
+        //             input.style.borderColor = '#d1d5db';
+        //         }
+        //     });
             
-            if (isValid) {
-                // Simulación de envío exitoso
-                alert('¡Turno reservado con éxito! Te contactaremos pronto para confirmar.');
-                this.reset();
-            } else {
-                alert('Por favor, completa todos los campos requeridos.');
-            }
-        });
+        //     if (isValid) {
+        //         alert('¡Turno reservado con éxito! Te contactaremos pronto para confirmar.');
+        //         fetch(`${API_URL}/turnos/`, {
+        //             method: 'POST',
+        //             headers: {
+        //                 'Content-Type': 'application/json'
+        //             },
+        //             body: JSON.stringify({
+        //                 nombre: this.querySelector('input[type="text"]').value.trim(),
+        //                 telefono: this.querySelector('input[type="tel"]').value.trim(),
+        //                 email: this.querySelector('input[type="email"]').value.trim(),
+        //                 tipo_turno: this.querySelector('select').value,
+        //                 fecha: this.querySelector('input[type="date"]').value.trim(),
+        //                 hora: horaSeleccionada,
+        //                 observaciones: this.querySelector('textarea').value.trim()
+        //             })
+        //         }).then(response => {
+        //             if (response.ok) {
+        //                 mostrarMensaje('¡Turno reservado con éxito!', 'ok');
+        //             } else {
+        //                 mostrarMensaje('Error al reservar el turno. Intenta nuevamente.', 'error');
+        //             }
+        //         }).catch(() => {
+        //             mostrarMensaje('No se pudo conectar con el servidor.', 'error');
+        //         });
+        //         this.reset();
+        //     } else {
+        //         alert('Por favor, completa todos los campos requeridos.');
+        //     }
+        // });
 
 
-        document.getElementById('turnoForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
+        // document.getElementById('turnoForm').addEventListener('submit', async function(e) {
+        //     e.preventDefault();
 
-            // ...validaciones...
+        //     // ...validaciones...
 
-            // Ejemplo de integración con backend
-            const datos = {
-                nombre: nombre,
-                telefono: telefono,
-                email: email,
-                servicio: this.querySelector('select').value,
-                fecha: this.querySelector('input[type="date"]').value,
-                hora: horaSeleccionada,
-                mensaje: this.querySelector('textarea').value
-            };
+        //     // Ejemplo de integración con backend
+        //     const datos = {
+        //         nombre: nombre,
+        //         telefono: telefono,
+        //         email: email,
+        //         servicio: this.querySelector('select').value,
+        //         fecha: this.querySelector('input[type="date"]').value,
+        //         hora: horaSeleccionada,
+        //         mensaje: this.querySelector('textarea').value
+        //     };
         
-            try {
-                const res = await fetch('http://127.0.0.1:8000/turnos/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(datos)
-                });
-                if (res.ok) {
-                    alert('¡Turno reservado con éxito!');
-                    this.reset();
-                } else {
-                    alert('Error al reservar el turno. Intenta nuevamente.');
-                }
-            } catch (error) {
-                alert('No se pudo conectar con el servidor.');
-            }
-        });
+        //     try {
+        //         const res = await fetch('http://127.0.0.1:8000/turnos/', {
+        //             method: 'POST',
+        //             headers: { 'Content-Type': 'application/json' },
+        //             body: JSON.stringify(datos)
+        //         });
+        //         if (res.ok) {
+        //             alert('¡Turno reservado con éxito!');
+        //             this.reset();
+        //         } else {
+        //             alert('Error al reservar el turno. Intenta nuevamente.');
+        //         }
+        //     } catch (error) {
+        //         alert('No se pudo conectar con el servidor.');
+        //     }
+        // });
 
         function mostrarMensaje(texto, tipo = "error") {
             const mensajeReserva = document.getElementById("mensajeReserva");
