@@ -10,7 +10,12 @@
         ul { list-style: none; padding: 0; max-width: 600px; margin: auto; }
         li { padding: 12px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px; background: white; display: flex; justify-content: space-between; align-items: center; }
         button { margin-left: 10px; }
-        .logout { margin: 20px auto; display: block; background: #d9534f; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+        .div1 {
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+        }
+        .logout { margin: 20px 1rem; display: block; background: #d9534f; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
         .day-group {
             margin-top: 20px;
             border: 1px solid #555;
@@ -36,6 +41,27 @@
             color: #f5f5f5;
             border-color: #444;
         }
+        /* Turno item layout */
+        .turno-item { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .turno-info { display: flex; flex-direction: column; }
+        .turno-info strong { font-size: 1.05em; margin-bottom: 4px; }
+        .turno-meta { font-size: 0.9em; color: #ddd; }
+        .turno-actions { margin-left: 12px; }
+
+        /* Simple spinner */
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.2);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        #spinnerWrapper { text-align: center; display: none; }
+        #errorMessage { text-align: center; color: #ffdddd; background: #7a2a2a; padding: 8px; border-radius: 6px; display: none; max-width: 700px; margin: 10px auto; }
     </style>
 </head>
 <body>
@@ -46,94 +72,141 @@
         window.location.href = "login.html";
         }
     </script>
-
-    <h1>Panel del Barbero</h1>
-
-    <button class="logout" onclick="logout()">Cerrar sesión</button>
+    <div class="div1">
+        <h1>Calendario de Cortes</h1>
+    
+        <button class="logout" onclick="logout()">Cerrar sesión</button>
+    </div>
 
     <div id="turnosContainer"></div> <!-- Contenedor para los grupos de días -->
     <p id="mensajeVacio" style="text-align: center; display: none;">No hay turnos cargados.</p>
+    <div id="spinnerWrapper"><div class="spinner" id="spinner"></div></div>
+    <div id="errorMessage"></div>
 
     <script>
         const turnosContainer = document.getElementById("turnosContainer");
         const mensajeVacio = document.getElementById("mensajeVacio");
 
+        function formatHora(horaRaw) {
+            if (!horaRaw) return '';
+            const parts = String(horaRaw).split(':');
+            if (parts.length >= 2) return parts[0].padStart(2,'0') + ':' + parts[1].padStart(2,'0');
+            return horaRaw;
+        }
+
         async function cargarTurnos() {
+            // mostrar spinner y ocultar mensajes previos
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('spinnerWrapper').style.display = 'block';
             try {
                 const res = await fetch("http://127.0.0.1:8000/turnos/"); // Obtener todos los turnos
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data = await res.json();
+                console.log(data);
 
                 turnosContainer.innerHTML = ""; // Limpiar el contenedor
 
-                if (data.turnos.length === 0) {
-                    mensajeVacio.style.display = "block";
-                } else {
-                    mensajeVacio.style.display = "none";
+                // Soportar dos formatos de respuesta: una lista directa o { turnos: [...] }
+                const turnos = Array.isArray(data) ? data : (data.turnos || []);
 
-                    // Agrupar turnos por fecha
-                    const turnosAgrupados = {};
-                    data.turnos.forEach(turno => {
-                        const fecha = turno[3]; // La fecha está en el índice 3
-                        if (!turnosAgrupados[fecha]) {
-                            turnosAgrupados[fecha] = [];
-                        }
-                        turnosAgrupados[fecha].push(turno);
+                if (!turnos || turnos.length === 0) {
+                    mensajeVacio.style.display = "block";
+                    return;
+                }
+
+                mensajeVacio.style.display = "none";
+
+                // Agrupar turnos por fecha (clave: 'YYYY-MM-DD')
+                const turnosAgrupados = {};
+                turnos.forEach(turno => {
+                    const fechaRaw = String(turno.fecha || '');
+                    const fecha = fechaRaw.split('T')[0];
+                    if (!turnosAgrupados[fecha]) turnosAgrupados[fecha] = [];
+                    turnosAgrupados[fecha].push(turno);
+                });
+
+                // Ordenar las fechas (YYYY-MM-DD lexicográficamente funciona)
+                const fechasOrdenadas = Object.keys(turnosAgrupados).sort();
+
+                fechasOrdenadas.forEach(fecha => {
+                    const dayGroup = document.createElement("div");
+                    dayGroup.classList.add("day-group");
+
+                    const fechaObj = new Date(fecha + 'T00:00:00'); // Añadir T para evitar problemas de zona horaria
+                    const opcionesFecha = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                    const nombreDia = fechaObj.toLocaleDateString('es-ES', opcionesFecha);
+
+                    const h2 = document.createElement("h2");
+                    h2.textContent = nombreDia.charAt(0).toUpperCase() + nombreDia.slice(1);
+                    dayGroup.appendChild(h2);
+
+                    const ul = document.createElement("ul");
+
+                    // Ordenar turnos dentro del día por hora (asumiendo formato HH:MM o HH:MM:SS)
+                    turnosAgrupados[fecha].sort((a, b) => {
+                        const horaA = formatHora(a.hora || '');
+                        const horaB = formatHora(b.hora || '');
+                        return horaA.localeCompare(horaB);
                     });
 
-                    // Ordenar las fechas
-                    const fechasOrdenadas = Object.keys(turnosAgrupados).sort();
+                    turnosAgrupados[fecha].forEach(turno => {
+                        const li = document.createElement("li");
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'turno-item';
 
-                    fechasOrdenadas.forEach(fecha => {
-                        const dayGroup = document.createElement("div");
-                        dayGroup.classList.add("day-group");
+                        const info = document.createElement('div');
+                        info.className = 'turno-info';
+                        info.innerHTML = `<strong>${formatHora(turno.hora)} — ${turno.nombre} (${turno.tipo_turno || ''})</strong>`;
+                        const meta = document.createElement('div');
+                        meta.className = 'turno-meta';
+                        meta.textContent = `${turno.telefono || ''} • ${turno.email || ''}`;
+                        info.appendChild(meta);
 
-                        const fechaObj = new Date(fecha + 'T00:00:00'); // Añadir T00:00:00 para evitar problemas de zona horaria
-                        const opcionesFecha = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                        const nombreDia = fechaObj.toLocaleDateString('es-ES', opcionesFecha);
-
-                        const h2 = document.createElement("h2");
-                        h2.textContent = nombreDia.charAt(0).toUpperCase() + nombreDia.slice(1); // Capitalizar la primera letra
-                        dayGroup.appendChild(h2);
-
-                        const ul = document.createElement("ul");
-                        
-                        // Ordenar turnos dentro del día por hora
-                        turnosAgrupados[fecha].sort((a, b) => {
-                            const horaA = new Date(`2000/01/01 ${a[4]}`);
-                            const horaB = new Date(`2000/01/01 ${b[4]}`);
-                            return horaA - horaB;
-                        });
-
-                        turnosAgrupados[fecha].forEach(turno => {
-                            const li = document.createElement("li");
-                            li.textContent = `Hora: ${turno[4]} | ${turno[1]} - Tel: ${turno[2]}`; // Mostrar hora primero
-
-                            const btnBorrar = document.createElement("button");
-                            btnBorrar.textContent = "Eliminar";
-                            btnBorrar.onclick = async () => {
-                                if (confirm("¿Seguro que querés eliminar este turno?")) {
-                                    const res = await fetch(`http://127.0.0.1:8000/turnos/${turno[0]}`, {
+                        const actions = document.createElement('div');
+                        actions.className = 'turno-actions';
+                        const btnBorrar = document.createElement("button");
+                        btnBorrar.textContent = "Eliminar";
+                        btnBorrar.onclick = async () => {
+                            if (confirm("¿Seguro que querés eliminar este turno?")) {
+                                try {
+                                    const res = await fetch(`http://127.0.0.1:8000/turnos/${turno.id}`, {
                                         method: "DELETE"
                                     });
                                     if (res.ok) {
-                                        alert("Turno eliminado");
-                                        cargarTurnos(); // Recargar la lista
+                                        // recargar sin alert
+                                        cargarTurnos();
                                     } else {
-                                        alert("Error al eliminar");
+                                        const text = await res.text();
+                                        console.error('Eliminar error', res.status, text);
+                                        const em = document.getElementById('errorMessage');
+                                        em.textContent = 'Error al eliminar el turno. Intenta nuevamente.';
+                                        em.style.display = 'block';
                                     }
+                                } catch (err) {
+                                    console.error('Error al eliminar turno:', err);
+                                    const em = document.getElementById('errorMessage');
+                                    em.textContent = 'No se pudo conectar al servidor para eliminar.';
+                                    em.style.display = 'block';
                                 }
-                            };
+                            }
+                        };
+                        actions.appendChild(btnBorrar);
 
-                            li.appendChild(btnBorrar);
-                            ul.appendChild(li);
-                        });
-                        dayGroup.appendChild(ul);
-                        turnosContainer.appendChild(dayGroup);
+                        wrapper.appendChild(info);
+                        wrapper.appendChild(actions);
+                        li.appendChild(wrapper);
+                        ul.appendChild(li);
                     });
-                }
+                    dayGroup.appendChild(ul);
+                    turnosContainer.appendChild(dayGroup);
+                });
             } catch (error) {
                 console.error("Error al cargar turnos:", error);
-                alert("No se pudo conectar con el servidor.");
+                const em = document.getElementById('errorMessage');
+                em.textContent = 'No se pudo conectar con el servidor. Verifica que el backend esté corriendo en http://127.0.0.1:8000';
+                em.style.display = 'block';
+            } finally {
+                document.getElementById('spinnerWrapper').style.display = 'none';
             }
         }
 
