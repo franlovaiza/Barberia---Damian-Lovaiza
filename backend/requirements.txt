@@ -1,6 +1,10 @@
 fastapi
 uvicorn
+uviloop
 SQLAlchemy
 pydantic
 pydantic-settings
 email-validator
+fastapi-mail 
+pydantic[email] 
+python-dotenv
