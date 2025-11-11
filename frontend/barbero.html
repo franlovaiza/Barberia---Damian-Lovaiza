@@ -5,8 +5,17 @@
     <title>Panel del Barbero</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        h1 { text-align: center; }
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background-image: url('./fondo.jpg');
+            background-size: cover; 
+            background-attachment: fixed; 
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            }
+        h1 { text-align: center; color: #ccc;}
         ul { list-style: none; padding: 0; max-width: 600px; margin: auto; }
         li { padding: 12px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px; background: white; display: flex; justify-content: space-between; align-items: center; }
         button { margin-left: 10px; }
@@ -21,7 +30,7 @@
             border: 1px solid #555;
             border-radius: 8px;
             padding: 15px;
-            background-color: #2a2a2a;
+            background-color: rgba(42, 42, 42, 0.85);
         }
         .day-group h2 {
             color: #fff;
@@ -72,11 +81,14 @@
         window.location.href = "login.html";
         }
     </script>
+
     <div class="div1">
         <h1>Calendario de Cortes</h1>
     
         <button class="logout" onclick="logout()">Cerrar sesión</button>
     </div>
+
+
 
     <div id="turnosContainer"></div> <!-- Contenedor para los grupos de días -->
     <p id="mensajeVacio" style="text-align: center; display: none;">No hay turnos cargados.</p>

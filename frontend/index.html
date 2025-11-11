@@ -51,64 +51,70 @@
 </head>
 <body class="font-sans bg-gray-50">
     <!-- Header con Navegación -->
-    <header class="fixed w-full z-50 sticky-header shadow-sm">
+    <!-- Header con Navegación -->
+    <header class="fixed w-full z-50 sticky-header shadow-sm" style="background-color: rgba(42, 42, 42, 0.85); backdrop-filter: blur(10px);">
         <nav class="container mx-auto px-6 py-4">
             <div class="flex justify-between items-center">
                 <!-- Logo -->
                 <div class="flex items-center space-x-2">
                     <img src="logo1.png" alt="Logo" class="h-12 w-auto">
-                    <span class="text-xl font-bold text-gray-800"></span>
+                    <span class="text-xl font-bold text-white"></span>
                 </div>
 
                 <!-- Links de Navegación -->
                 <div class="hidden md:flex items-center space-x-8">
-                    <a href="#peluquero" class="nav-link">Nuestro Barbero</a>
-                    <a href="#turnos" class="nav-link">Sacar Turno</a>
-                    <a href="#contacto" class="nav-link">Contacto</a>
+                    <a href="#peluquero" class="nav-link text-white hover:text-gray-300">Nuestro Barbero</a>
+                    <a href="#turnos" class="nav-link text-white hover:text-gray-300">Sacar Turno</a>
+                    <a href="#contacto" class="nav-link text-white hover:text-gray-300">Contacto</a>
                 </div>
 
                 <!-- Login -->
                 <div class="flex items-center space-x-4">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-user"></i>
+                    <a href="login.html" class="nav-link text-white hover:text-gray-300">
                         <span class="hidden md:inline ml-2">Login</span>
                     </a>
                     <button id="menuBtn" class="md:hidden">
-                        <i class="fas fa-bars text-gray-700 text-xl"></i>
+                        <i class="fas fa-bars text-white text-xl"></i>
                     </button>
-                    <!-- Menú móvil -->
-                    <div id="mobileMenu" class="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-90 flex flex-col items-center justify-center space-y-8 z-50 hidden">
-                        <a href="#peluquero" class="nav-link text-white text-2xl">Nuestro Barbero</a>
-                        <a href="#turnos" class="nav-link text-white text-2xl">Sacar Turno</a>
-                        <a href="#contacto" class="nav-link text-white text-2xl">Contacto</a>
-                        <button id="closeMenu" class="mt-8 text-white text-3xl">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <script>
-                        const menuBtn = document.getElementById('menuBtn');
-                        const mobileMenu = document.getElementById('mobileMenu');
-                        const closeMenu = document.getElementById('closeMenu');
-
-                        menuBtn.addEventListener('click', () => {
-                            mobileMenu.classList.remove('hidden');
-                        });
-
-                        closeMenu.addEventListener('click', () => {
-                            mobileMenu.classList.add('hidden');
-                        });
-
-                        // Cerrar menú al hacer click en un link
-                        mobileMenu.querySelectorAll('a').forEach(link => {
-                            link.addEventListener('click', () => {
-                                mobileMenu.classList.add('hidden');
-                            });
-                        });
-                    </script>
                 </div>
             </div>
         </nav>
     </header>
+
+    <!-- Menú móvil (FUERA del header) -->
+    <div id="mobileMenu" class="fixed top-0 left-0 w-full h-full flex flex-col items-center justify-center space-y-8 hidden" style="z-index: 100; background-color: rgba(42, 42, 42, 0.8); backdrop-filter: blur(10px);">
+        <a href="#peluquero" class="nav-link text-white text-2xl hover:text-gray-300 transition">Nuestro Barbero</a>
+        <a href="#turnos" class="nav-link text-white text-2xl hover:text-gray-300 transition">Sacar Turno</a>
+        <a href="#contacto" class="nav-link text-white text-2xl hover:text-gray-300 transition">Contacto</a>
+        <a href="login.html" class="nav-link text-white text-2xl hover:text-gray-300 transition">Login</a>
+        <button id="closeMenu" class="mt-8 text-white text-4xl hover:text-gray-300 transition">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <script>
+        const menuBtn = document.getElementById('menuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const closeMenu = document.getElementById('closeMenu');
+
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Evitar scroll cuando el menú está abierto
+        });
+
+        closeMenu.addEventListener('click', () => {
+            mobileMenu.classList.add('hidden');
+            document.body.style.overflow = ''; // Restaurar scroll
+        });
+
+        // Cerrar menú al hacer click en un link
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+                document.body.style.overflow = ''; // Restaurar scroll
+            });
+        });
+    </script>
 
 <!-- Hero Section 
     <section id="inicio" class="pt-24 hero-bg text-white">
@@ -230,7 +236,7 @@
     </section>
 
     <!-- Footer -->
-    <footer id="contacto" class="bg-gray-800 text-white py-12">
+    <footer id="contacto" class="bg-gray-800 text-white py-12" style="background-color: rgba(42, 42, 42, 0.8);">
         <div class="container mx-auto px-6">
             <div class="grid md:grid-cols-3 gap-8">
                 <div>

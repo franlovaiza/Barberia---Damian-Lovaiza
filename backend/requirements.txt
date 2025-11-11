@@ -8,3 +8,7 @@ email-validator
 fastapi-mail 
 pydantic[email] 
 python-dotenv
+sqlalchemy
+pydantic
+pydantic-settings
+email-validator
