@@ -23,6 +23,25 @@
             padding: 1rem;
             display: flex;
             justify-content: space-between;
+            align-items: center; /* centrar verticalmente */
+            gap: 1rem;
+        }
+        /* Estructura para tener izquierda / centro (logo) / derecha */
+        .div1 .left { flex: 0 0 auto; }
+        .div1 .center { flex: 1 1 auto; display: flex; justify-content: center; }
+        .div1 .right { flex: 0 0 auto; }
+        .div1 .logo {
+            height: 64px;
+            max-height: 10vh;
+            width: auto;
+            display: block;
+        }
+        /* Ajustes para pantallas pequeñas */
+        @media (max-width: 480px) {
+            .div1 { flex-direction: row; padding: 0.5rem; }
+            .div1 .left h1 { font-size: 1.1rem; }
+            .div1 .logo { height: 44px; }
+            .logout { padding: 8px 12px; }
         }
         .logout { margin: 20px 1rem; display: block; background: #d9534f; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
         .day-group {
@@ -82,10 +101,14 @@
         }
     </script>
 
-    <div class="div1">
-        <h1>Calendario de Cortes</h1>
-    
-        <button class="logout" onclick="logout()">Cerrar sesión</button>
+    <div class="div1" style="background-color: rgba(42, 42, 42, 0.85)"; >
+        <div class="left"><h1>Calendario de Cortes</h1></div> 
+        <div class="center">
+            <img src="./logo1.png" alt="Logo" class="logo">
+        </div>
+        <div class="right">
+            <button class="logout" onclick="localStorage.removeItem('autenticado'); window.location.href='index.html';">Cerrar sesión</button>
+        </div>
     </div>
 
 
