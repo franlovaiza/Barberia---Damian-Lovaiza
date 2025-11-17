@@ -55,7 +55,7 @@ async def create_turno(db: Session, turno: TurnoCreate) -> TurnoSchema:
             )
         
         # Enviar el email
-        await fm.send_message(message)
+        # await fm.send_message(message)
 
     except Exception as e:
         print(f"Error al enviar email: {str(e)}")

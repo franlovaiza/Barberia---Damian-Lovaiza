@@ -325,176 +325,34 @@
     </footer>
 
     <script type="module">
-        import { API_URL } from './config.js'; // ruta relativa desde index.html
-        console.log(API_URL);
-        // ahora puedes usar API_URL en este script
-        window.apiUrl = API_URL;
-        </script>
-    <script>
+        import { API_URL } from './config.js';
+        console.log('🌐 API URL:', API_URL);
         
-        const apiUrl = window.apiUrl;
-       
-        fetch(`${apiUrl}/turnos/`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(data => {
-            console.log('Turnos obtenidos:', data);
-                
-        })
-        .catch(err => {
-            console.error('Error al obtener turnos:', err);
-        });
+        const apiUrl = API_URL;
+        
+        // Variables globales
+        let horaSeleccionada = null;
+        let modalTimeout = null;
+        const blockedDays = [0, 1]; // Domingo y Lunes
+        
+        // Referencias a elementos del DOM
+        const fechaInput = document.getElementById("fecha");
+        const horariosDiv = document.getElementById("horarios");
+        const horariosLabel = document.getElementById('horariosLabel');
+        const submitBtn = document.getElementById('submitBtn');
+        const form = document.getElementById('turnoForm');
 
+        // Funciones de validación
         function validarTelefono(telefono) {
-            // Ejemplo: acepta solo números y debe tener entre 8 y 15 dígitos
             return /^\d{8,15}$/.test(telefono);
         }
 
         function validarEmail(email) {
-            // Validación básica de email
             return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
         }
 
-        
-
-        document.getElementById('turnoForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const nombre = this.querySelector('input[type="text"]').value.trim();
-            const telefono = this.querySelector('input[type="tel"]').value.trim();
-            const email = this.querySelector('input[type="email"]').value.trim();
-            const tipo_turno = this.querySelector('select').value;
-            const fecha = this.querySelector('input[type="date"]').value.trim();
-            const hora = `${horaSeleccionada}:00`;
-
-            let mensaje = "";
-            if (!nombre) mensaje += "El nombre es obligatorio.\n";
-            if (!validarTelefono(telefono)) mensaje += "El teléfono debe tener entre 8 y 15 dígitos y solo números.\n";
-            if (!validarEmail(email)) mensaje += "El email no es válido.\n";
-
-            if (mensaje) {
-                mostrarMensaje(mensaje, 'error');
-                return;
-            }
-
-
-            fetch(`${apiUrl}/turnos/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    nombre: nombre,
-                    telefono: telefono,
-                    email: email,
-                    tipo_turno: tipo_turno,
-                    fecha: fecha,
-                    hora: hora
-                })
-            }).then(async response => {
-                if (response.ok) {
-                    mostrarMensaje('¡Turno reservado con éxito! Te contactaremos pronto para confirmar.', 'ok');
-                    this.reset();
-                } else {
-                    let extra = '';
-                    try { extra = await response.text(); } catch(e){}
-                    mostrarMensaje('Error al reservar el turno. Intenta nuevamente.' + (extra ? ' ' + extra : ''), 'error');
-                }
-            }).catch(() => {
-                mostrarMensaje('No se pudo conectar con el servidor.', 'error');
-            });
-
-        });
-    </script>
-    <script>
-        // import { API_URL } from './config.js';
-        // // Validación del formulario
-        // document.getElementById('turnoForm').addEventListener('submit', function(e) {
-        //     e.preventDefault();
-            
-        //     // Validación básica
-        //     const inputs = this.querySelectorAll('input[required]');
-        //     let isValid = true;
-            
-        //     inputs.forEach(input => {
-        //         if (!input.value.trim()) {
-        //             input.style.borderColor = 'red';
-        //             isValid = false;
-        //         } else {
-        //             input.style.borderColor = '#d1d5db';
-        //         }
-        //     });
-            
-        //     if (isValid) {
-        //         alert('¡Turno reservado con éxito! Te contactaremos pronto para confirmar.');
-        //         fetch(`${API_URL}/turnos/`, {
-        //             method: 'POST',
-        //             headers: {
-        //                 'Content-Type': 'application/json'
-        //             },
-        //             body: JSON.stringify({
-        //                 nombre: this.querySelector('input[type="text"]').value.trim(),
-        //                 telefono: this.querySelector('input[type="tel"]').value.trim(),
-        //                 email: this.querySelector('input[type="email"]').value.trim(),
-        //                 tipo_turno: this.querySelector('select').value,
-        //                 fecha: this.querySelector('input[type="date"]').value.trim(),
-        //                 hora: horaSeleccionada,
-        //                 observaciones: this.querySelector('textarea').value.trim()
-        //             })
-        //         }).then(response => {
-        //             if (response.ok) {
-        //                 mostrarMensaje('¡Turno reservado con éxito!', 'ok');
-        //             } else {
-        //                 mostrarMensaje('Error al reservar el turno. Intenta nuevamente.', 'error');
-        //             }
-        //         }).catch(() => {
-        //             mostrarMensaje('No se pudo conectar con el servidor.', 'error');
-        //         });
-        //         this.reset();
-        //     } else {
-        //         alert('Por favor, completa todos los campos requeridos.');
-        //     }
-        // });
-
-
-        // document.getElementById('turnoForm').addEventListener('submit', async function(e) {
-        //     e.preventDefault();
-
-        //     // ...validaciones...
-
-        //     // Ejemplo de integración con backend
-        //     const datos = {
-        //         nombre: nombre,
-        //         telefono: telefono,
-        //         email: email,
-        //         servicio: this.querySelector('select').value,
-        //         fecha: this.querySelector('input[type="date"]').value,
-        //         hora: horaSeleccionada,
-        //         mensaje: this.querySelector('textarea').value
-        //     };
-        
-        //     try {
-        //         const res = await fetch('http://127.0.0.1:8000/turnos/', {
-        //             method: 'POST',
-        //             headers: { 'Content-Type': 'application/json' },
-        //             body: JSON.stringify(datos)
-        //         });
-        //         if (res.ok) {
-        //             alert('¡Turno reservado con éxito!');
-        //             this.reset();
-        //         } else {
-        //             alert('Error al reservar el turno. Intenta nuevamente.');
-        //         }
-        //     } catch (error) {
-        //         alert('No se pudo conectar con el servidor.');
-        //     }
-        // });
-
+        // Función para mostrar mensajes
         function mostrarMensaje(texto, tipo = "error") {
-            // Mostrar solo en modal overlay. Limpiar cualquier mensaje pequeño debajo del formulario.
             const mensajeReserva = document.getElementById("mensajeReserva");
             if (mensajeReserva) {
                 mensajeReserva.textContent = '';
@@ -506,14 +364,11 @@
             const content = document.getElementById('messageModalContent');
             if (!overlay || !modal || !content) return;
 
-            // Si texto vacío, ocultar
             if (!texto || texto.trim() === '') {
                 hideModal();
                 return;
             }
 
-            // Preparar modal
-            // Escape HTML then convert newlines to <br> for readable multi-line messages
             function escapeHtml(s) {
                 return s
                     .replace(/&/g, '&amp;')
@@ -522,16 +377,15 @@
                     .replace(/"/g, '&quot;')
                     .replace(/'/g, '&#039;');
             }
+            
             content.innerHTML = escapeHtml(texto).replace(/\n/g, '<br>');
             modal.classList.remove('ok', 'error');
             if (tipo === 'ok') modal.classList.add('ok');
             if (tipo === 'error') modal.classList.add('error');
 
-            // Mostrar overlay/modal
             overlay.style.display = 'flex';
             document.body.style.overflow = 'hidden';
 
-            // Configurar cierre por botón y fuera del modal (una sola vez)
             const closeBtn = modal.querySelector('.closeBtn');
             if (closeBtn && !closeBtn._listenerAdded) {
                 closeBtn.addEventListener('click', hideModal);
@@ -544,7 +398,6 @@
                 overlay._listenerAdded = true;
             }
 
-            // Auto-hide after 4s
             if (modalTimeout) clearTimeout(modalTimeout);
             modalTimeout = setTimeout(() => {
                 hideModal();
@@ -562,7 +415,222 @@
             }
         }
 
-        // Smooth scrolling para los links de navegación
+        // Función para actualizar label de horarios
+        function updateHorariosLabel() {
+            if (!fechaInput || !horariosLabel) return;
+            if (fechaInput.value && fechaInput.value.trim() !== '') {
+                horariosLabel.classList.remove('hidden');
+            } else {
+                horariosLabel.classList.add('hidden');
+            }
+        }
+
+        // Función para actualizar estado del botón submit
+        function updateSubmitState() {
+            if (!submitBtn) return;
+            const fechaValida = fechaInput && fechaInput.value && fechaInput.value.trim() !== '';
+            const diaValido = fechaValida ? !blockedDays.includes(new Date(fechaInput.value).getUTCDay()) : false;
+            submitBtn.disabled = !(fechaValida && diaValido && horaSeleccionada);
+        }
+
+        // Generar horarios disponibles
+        function generarHorarios() {
+            horariosDiv.innerHTML = "";
+            horaSeleccionada = null;
+            const horarios = [];
+        
+            // Mañana: 09:00 - 12:30
+            for (let h = 9; h <= 12; h++) {
+                for (let m = 0; m < 60; m += 30) {
+                    if (!(h === 12 && m > 30)) {
+                        horarios.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
+                    }
+                }
+            }
+
+            // Tarde: 15:00 - 20:30
+            for (let h = 15; h <= 20; h++) {
+                for (let m = 0; m < 60; m += 30) {
+                    if (!(h === 20 && m > 30)) {
+                        horarios.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
+                    }
+                }
+            }
+
+            const horariosReservados = {};
+            const fechaSeleccionada = fechaInput ? fechaInput.value : '';
+
+            horarios.forEach(hora => {
+                const reservadosHoy = horariosReservados[fechaSeleccionada] || [];
+                if (reservadosHoy.includes(hora)) return;
+
+                const btn = document.createElement("button");
+                btn.textContent = hora;
+                btn.type = "button";
+                btn.className = 
+                    "px-4 py-2 rounded-xl border border-gray-300 text-gray-700 hover:bg-blue-500 hover:text-white transition " +
+                    "focus:outline-none focus:ring-2 focus:ring-blue-400";
+
+                btn.addEventListener("click", () => {
+                    document.querySelectorAll("#horarios button").forEach(b => {
+                        b.classList.remove("bg-blue-500", "text-white");
+                        b.classList.add("border-gray-300", "text-gray-700");
+                    });
+
+                    btn.classList.remove("border-gray-300", "text-gray-700");
+                    btn.classList.add("bg-blue-500", "text-white");
+                    
+                    horaSeleccionada = hora;
+                    console.log("✅ Hora seleccionada:", horaSeleccionada);
+                    
+                    if (fechaInput) fechaInput.classList.remove('input-invalid');
+                    mostrarMensaje('', '');
+                    updateSubmitState();
+                });
+            
+                horariosDiv.appendChild(btn);
+            });
+        }
+
+        // Event listener para fecha
+        if (fechaInput) {
+            const todayStr = new Date().toISOString().split('T')[0];
+            fechaInput.setAttribute('min', todayStr);
+
+            fechaInput.addEventListener('input', () => {
+                const todayStr = new Date().toISOString().split('T')[0];
+                if (fechaInput.value && fechaInput.value < todayStr) {
+                    mostrarMensaje('No puedes seleccionar una fecha anterior a hoy.', 'error');
+                    fechaInput.classList.add('input-invalid');
+                    fechaInput.value = '';
+                    horariosDiv.innerHTML = '';
+                    horaSeleccionada = null;
+                    updateHorariosLabel();
+                    updateSubmitState();
+                    return;
+                }
+
+                const fecha = new Date(fechaInput.value);
+                const dia = fecha.getUTCDay();
+                
+                if (isNaN(dia)) {
+                    horariosDiv.innerHTML = '';
+                    horaSeleccionada = null;
+                    updateHorariosLabel();
+                    updateSubmitState();
+                    return;
+                }
+                
+                if (blockedDays.includes(dia)) {
+                    mostrarMensaje('Solo se atiende de martes a sábado.', 'error');
+                    fechaInput.classList.add('input-invalid');
+                    fechaInput.value = '';
+                    horariosDiv.innerHTML = '';
+                    horaSeleccionada = null;
+                    updateHorariosLabel();
+                    updateSubmitState();
+                } else {
+                    fechaInput.classList.remove('input-invalid');
+                    mostrarMensaje('', '');
+                    generarHorarios();
+                    updateHorariosLabel();
+                    updateSubmitState();
+                }
+            });
+            
+            updateHorariosLabel();
+            updateSubmitState();
+        }
+
+        // Event listener del formulario
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                console.log('🔍 Submit capturado');
+
+                const nombre = this.querySelector('input[type="text"]').value.trim();
+                const telefono = this.querySelector('input[type="tel"]').value.trim();
+                const email = this.querySelector('input[type="email"]').value.trim();
+                const tipo_turno = this.querySelector('select').value;
+                const fecha = this.querySelector('input[type="date"]').value.trim();
+                const hora = `${horaSeleccionada}:00`;
+
+                let mensaje = "";
+                if (!nombre) mensaje += "El nombre es obligatorio.\n";
+                if (!validarTelefono(telefono)) mensaje += "El teléfono debe tener entre 8 y 15 dígitos.\n";
+                if (!validarEmail(email)) mensaje += "El email no es válido.\n";
+                if (!horaSeleccionada) mensaje += "Debes seleccionar una hora.\n";
+
+                if (mensaje) {
+                    console.log('❌ Validación fallida:', mensaje);
+                    mostrarMensaje(mensaje, 'error');
+                    return false;
+                }
+
+                console.log('✅ Enviando datos...');
+
+                const payload = {
+                    nombre,
+                    telefono,
+                    email,
+                    tipo_turno,
+                    fecha,
+                    hora
+                };
+
+                console.log('📦 Payload:', payload);
+
+                fetch(`${apiUrl}/turnos/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                })
+                .then(async response => {
+                    console.log('📥 Response:', response.status, response.ok);
+                    
+                    if (response.ok || response.status === 201) {
+                        const data = await response.json();
+                        console.log('✅ Turno creado:', data);
+                        
+                        mostrarMensaje('¡Turno reservado con éxito! Te contactaremos pronto para confirmar.', 'ok');
+                        
+                        form.reset();
+                        horaSeleccionada = null;
+                        horariosDiv.innerHTML = '';
+                        horariosLabel.classList.add('hidden');
+                        updateSubmitState();
+                    } else {
+                        const error = await response.text();
+                        console.error('❌ Error:', error);
+                        mostrarMensaje(`Error: ${error}`, 'error');
+                    }
+                })
+                .catch(err => {
+                    console.error('❌ Error de red:', err);
+                    mostrarMensaje('No se pudo conectar con el servidor.', 'error');
+                });
+
+                return false;
+            });
+            
+            console.log('✅ Event listener agregado al formulario');
+        }
+
+        // Obtener turnos inicial
+        fetch(`${apiUrl}/turnos/`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('📋 Turnos obtenidos:', data);
+            })
+            .catch(err => {
+                console.error('❌ Error al obtener turnos:', err);
+            });
+
+        // Smooth scrolling
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -576,7 +644,7 @@
             });
         });
 
-        // Efecto de cambio de header al hacer scroll
+        // Header scroll effect
         window.addEventListener('scroll', function() {
             const header = document.querySelector('header');
             if (window.scrollY > 100) {
@@ -585,165 +653,6 @@
                 header.classList.remove('sticky-header');
             }
         });
-
-        
-
-
-
-
-    const fechaInput = document.getElementById("fecha");
-    const horariosDiv = document.getElementById("horarios");
-    let horaSeleccionada = null;
-    const submitBtn = document.getElementById('submitBtn');
-    // Timeout for auto-hide modal
-    let modalTimeout = null;
-    // Días bloqueados: 0 = Domingo, 1 = Lunes (según tu elección)
-    const blockedDays = [0, 1];
-
-        // Mostrar/ocultar la etiqueta de "Horarios disponibles" según si el usuario seleccionó una fecha
-        const horariosLabel = document.getElementById('horariosLabel');
-        // Establecer fecha mínima (hoy) para evitar seleccionar días pasados
-        if (fechaInput) {
-            const todayStr = new Date().toISOString().split('T')[0];
-            fechaInput.setAttribute('min', todayStr);
-        }
-        function updateHorariosLabel() {
-            if (!fechaInput || !horariosLabel) return;
-            if (fechaInput.value && fechaInput.value.trim() !== '') {
-                horariosLabel.classList.remove('hidden');
-            } else {
-                horariosLabel.classList.add('hidden');
-            }
-        }
-        function updateSubmitState() {
-            // Habilita el botón de enviar solo si hay fecha válida y hora seleccionada
-            if (!submitBtn) return;
-            const fechaValida = fechaInput && fechaInput.value && fechaInput.value.trim() !== '';
-            const diaValido = fechaValida ? !blockedDays.includes(new Date(fechaInput.value).getUTCDay()) : false;
-            submitBtn.disabled = !(fechaValida && diaValido && horaSeleccionada);
-        }
-
-        if (fechaInput) {
-            fechaInput.addEventListener('input', () => {
-                // Evitar seleccionar fechas pasadas (entrada manual o por calendario)
-                const todayStr = new Date().toISOString().split('T')[0];
-                if (fechaInput.value && fechaInput.value < todayStr) {
-                    mostrarMensaje('No puedes seleccionar una fecha anterior a hoy.', 'error');
-                    fechaInput.classList.add('input-invalid');
-                    fechaInput.value = '';
-                    horariosDiv.innerHTML = '';
-                    horaSeleccionada = null;
-                    updateHorariosLabel();
-                    updateSubmitState();
-                    return;
-                }
-
-                // Validación de días bloqueados (domingo y lunes)
-                const fecha = new Date(fechaInput.value);
-                const dia = fecha.getUTCDay(); // 0=Domingo, 1=Lunes
-                if (isNaN(dia)) {
-                    // fecha inválida
-                    horariosDiv.innerHTML = '';
-                    horaSeleccionada = null;
-                    updateHorariosLabel();
-                    updateSubmitState();
-                    return;
-                }
-                if (blockedDays.includes(dia)) {
-                    mostrarMensaje('Solo se atiende de martes a sábado.', 'error');
-                    fechaInput.classList.add('input-invalid');
-                    fechaInput.value = '';
-                    horariosDiv.innerHTML = '';
-                    horaSeleccionada = null;
-                    updateHorariosLabel();
-                    updateSubmitState();
-                } else {
-                    // Fecha válida
-                    fechaInput.classList.remove('input-invalid');
-                    mostrarMensaje('', '');
-                    generarHorarios();
-                    updateHorariosLabel();
-                    updateSubmitState();
-                }
-            });
-            // inicializar estado en caso de que ya haya un valor
-            updateHorariosLabel();
-            updateSubmitState();
-        }
-
-        // Generar horarios disponibles
-        function generarHorarios() {
-            horariosDiv.innerHTML = "";
-            horaSeleccionada = null; // resetear selección al generar nuevos horarios
-            const horarios = [];
-        
-        // Mañana: 09:00 - 12:30
-        for (let h = 9; h <= 12; h++) {
-            for (let m = 0; m < 60; m += 30) {
-                if (!(h === 12 && m > 30)) {
-                    horarios.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
-                }
-            }
-        }
-
-        // Tarde: 15:00 - 20:30
-        for (let h = 15; h <= 20; h++) {
-            for (let m = 0; m < 60; m += 30) {
-                if (!(h === 20 && m > 30)) {
-                    horarios.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
-                }
-            }
-        }
-
-        // Lista de horarios ya reservados (ejemplo, deberías obtener esto de tu backend)
-        const horariosReservados = {
-            // "2024-06-10": ["09:00", "15:30"]
-        };
-        // Obtener la fecha seleccionada en formato YYYY-MM-DD (calcular en el momento)
-        const fechaSeleccionada = fechaInput ? fechaInput.value : '';
-
-        // Crear botones de horario, excluyendo los reservados
-        horarios.forEach(hora => {
-            // Verifica si el horario está reservado para la fecha seleccionada
-            const reservadosHoy = horariosReservados[fechaSeleccionada] || [];
-            if (reservadosHoy.includes(hora)) return; // No mostrar si está reservado
-
-            const btn = document.createElement("button");
-            btn.textContent = hora;
-            btn.type = "button";
-            btn.className = 
-                "px-4 py-2 rounded-xl border border-gray-300 text-gray-700 hover:bg-blue-500 hover:text-white transition " +
-                "focus:outline-none focus:ring-2 focus:ring-blue-400";
-
-            btn.addEventListener("click", () => {
-                // Desmarcar el anterior
-                document.querySelectorAll("#horarios button").forEach(b => {
-                    b.classList.remove("bg-blue-500", "text-white");
-                    b.classList.add("border-gray-300", "text-gray-700");
-                });
-
-                // Marcar el seleccionado
-                btn.classList.remove("border-gray-300", "text-gray-700");
-                btn.classList.add("bg-blue-500", "text-white");
-                
-                horaSeleccionada = hora;
-                console.log("Hora seleccionada:", horaSeleccionada);
-                // Quitar estado inválido del input y actualizar el estado del submit
-                if (fechaInput) fechaInput.classList.remove('input-invalid');
-                mostrarMensaje('', '');
-                updateSubmitState();
-            });
-        
-            horariosDiv.appendChild(btn);
-        });
-    }
-
-
-
-
-    
     </script>
 </body>
-
 </html>
-
