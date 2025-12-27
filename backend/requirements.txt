@@ -1,6 +1,5 @@
 fastapi
 uvicorn
-uviloop
 SQLAlchemy
 pydantic
 pydantic-settings

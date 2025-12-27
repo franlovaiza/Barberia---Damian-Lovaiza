@@ -11,9 +11,14 @@ origins = [
     "http://127.0.0.1:3002", # Tu frontend local
     "http://localhost:3002",
     "https://127.0.0.1:5500",
-    "https://localhost:5500"
+    "https://localhost:5500",
+    "barberia-lovaiza.vercel.app",
+    "https://barberia-lovaiza.onrender.com"
+
     # Agrega aquí cualquier otro origen donde se despliegue tu frontend
 ]
+
+    
 
 app.add_middleware(
     CORSMiddleware,
