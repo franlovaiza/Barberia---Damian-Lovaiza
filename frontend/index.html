@@ -69,7 +69,7 @@
 
                 <!-- Login -->
                 <div class="flex items-center space-x-4">
-                    <a href="#" class="nav-link">
+                    <a href="login.html" class="nav-link">
                         <i class="fas fa-user"></i>
                         <span class="hidden md:inline ml-2">Login</span>
                     </a>
@@ -288,7 +288,7 @@ function validarEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-document.getElementById('turnoForm').addEventListener('submit', function(e) {
+document.getElementById('turnoForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
     const nombre = this.querySelector('input[type="text"]').value.trim();
@@ -296,40 +296,65 @@ document.getElementById('turnoForm').addEventListener('submit', function(e) {
     const email = this.querySelector('input[type="email"]').value.trim();
     const tipo_turno = this.querySelector('select').value;
     const fecha = this.querySelector('input[type="date"]').value.trim();
-    const hora = `${horaSeleccionada}:00`;
 
     let mensaje = "";
     if (!nombre) mensaje += "El nombre es obligatorio.\n";
     if (!validarTelefono(telefono)) mensaje += "El teléfono debe tener entre 8 y 15 dígitos y solo números.\n";
     if (!validarEmail(email)) mensaje += "El email no es válido.\n";
+    if (!fecha) mensaje += "Elegí una fecha.\n";
+    if (!horaSeleccionada) mensaje += "Elegí un horario disponible.\n";
 
     if (mensaje) {
         alert(mensaje);
         return;
     }
 
+    const hora = `${horaSeleccionada}:00`;
     const apiUrl = window.apiUrl;
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const textoOriginalBtn = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Reservando...";
+    mostrarMensaje("", "ok"); // limpiar mensaje previo
 
-    fetch(`${apiUrl}/turnos/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            nombre: nombre,
-            telefono: telefono,
-            email: email,
-            tipo_turno: tipo_turno,
-            fecha: fecha,
-            hora: hora
-        })
-    }).then(response => {
-        if (response) {
-            alert('¡Turno reservado con éxito! Te contactaremos pronto para confirmar.');
+    try {
+        const response = await fetch(`${apiUrl}/turnos/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                nombre: nombre,
+                telefono: telefono,
+                email: email,
+                tipo_turno: tipo_turno,
+                fecha: fecha,
+                hora: hora
+            })
+        });
+
+        if (response.ok) {
+            mostrarMensaje('¡Turno reservado con éxito! Te contactaremos pronto para confirmar.', 'ok');
             this.reset();
+            horaSeleccionada = null;
+            horariosDiv.innerHTML = "";
+        } else {
+            // El backend devuelve, por ejemplo, 409 si el horario ya fue tomado por otra persona
+            let detalle = 'No se pudo reservar el turno. Intenta nuevamente.';
+            try {
+                const errData = await response.json();
+                if (errData.detail) detalle = errData.detail;
+            } catch (_) {}
+            mostrarMensaje(detalle, 'error');
+            // Si el horario ya no está disponible, refrescamos la lista para reflejarlo
+            if (response.status === 409) generarHorarios();
         }
-    })
-
+    } catch (error) {
+        mostrarMensaje('No se pudo conectar con el servidor. Intenta nuevamente en unos minutos.', 'error');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = textoOriginalBtn;
+    }
 });
     </script>
     <script>
@@ -457,6 +482,11 @@ document.getElementById('turnoForm').addEventListener('submit', function(e) {
 
         // Bloquear domingos y lunes
         fechaInput.addEventListener("input", () => {
+            if (!fechaInput.value) {
+                horariosDiv.innerHTML = "";
+                horaSeleccionada = null;
+                return;
+            }
             const fecha = new Date(fechaInput.value);
             const dia = fecha.getUTCDay(); // 0=Domingo, 1=Lunes, ..., 6=Sábado
             if (dia === 0 || dia === 1) {
@@ -469,10 +499,11 @@ document.getElementById('turnoForm').addEventListener('submit', function(e) {
         });
     
         // Generar horarios disponibles
-        function generarHorarios() {
-            horariosDiv.innerHTML = "";
+        async function generarHorarios() {
+            horariosDiv.innerHTML = '<p class="text-gray-400 col-span-full text-center">Cargando horarios...</p>';
+            horaSeleccionada = null;
             const horarios = [];
-        
+
         // Mañana: 09:00 - 12:30
         for (let h = 9; h <= 12; h++) {
             for (let m = 0; m < 60; m += 30) {
@@ -491,18 +522,28 @@ document.getElementById('turnoForm').addEventListener('submit', function(e) {
             }
         }
 
-        // Lista de horarios ya reservados (ejemplo, deberías obtener esto de tu backend)
-        const horariosReservados = [
-            // Ejemplo: "2024-06-10": ["09:00", "15:30"]
-        ];
         // Obtener la fecha seleccionada en formato YYYY-MM-DD
         const fechaSeleccionada = fechaInput.value;
 
+        // Traer del backend los horarios que YA están ocupados para esta fecha
+        let horariosOcupados = [];
+        try {
+            const apiUrl = window.apiUrl;
+            const res = await fetch(`${apiUrl}/turnos/ocupados?fecha=${fechaSeleccionada}`);
+            if (res.ok) {
+                const data = await res.json();
+                horariosOcupados = data.horarios || [];
+            }
+        } catch (err) {
+            console.error("No se pudieron cargar los horarios ocupados:", err);
+        }
+
+        horariosDiv.innerHTML = "";
+
         // Crear botones de horario, excluyendo los reservados
         horarios.forEach(hora => {
-            // Verifica si el horario está reservado para la fecha seleccionada
-            const reservadosHoy = horariosReservados[fechaSeleccionada] || [];
-            if (reservadosHoy.includes(hora)) return; // No mostrar si está reservado
+            // No mostrar si ese horario ya está ocupado para la fecha elegida
+            if (horariosOcupados.includes(hora)) return;
 
             const btn = document.createElement("button");
             btn.textContent = hora;
@@ -538,4 +579,3 @@ document.getElementById('turnoForm').addEventListener('submit', function(e) {
 </body>
 
 </html>
-

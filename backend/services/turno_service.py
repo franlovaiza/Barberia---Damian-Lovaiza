@@ -1,7 +1,25 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from db.models.turno_model import Turno
 from schemas.turno_schema import TurnoCreate, TurnoSchema, TurnoOut
 from typing import List, Optional
+from datetime import date
+
+# Estados que "bloquean" un horario. Si un turno está Cancelado, ese horario
+# vuelve a quedar disponible para que otro cliente lo tome.
+ESTADOS_QUE_OCUPAN_HORARIO = ["Reservado", "Confirmado"]
+
+def get_horarios_ocupados(db: Session, fecha: date) -> List[str]:
+    # Turno.fecha se guarda como DateTime ("2026-08-10 00:00:00.000000"), así que
+    # comparamos solo la parte de fecha con func.date() en vez de == directo.
+    turnos = (
+        db.query(Turno)
+        .filter(func.date(Turno.fecha) == fecha.isoformat())
+        .filter(Turno.estado.in_(ESTADOS_QUE_OCUPAN_HORARIO))
+        .all()
+    )
+    # hora se guarda como "HH:MM:SS" -> lo devolvemos como "HH:MM" para matchear el frontend
+    return [t.hora[:5] for t in turnos]
 
 def get_all_turnos_paginated(db: Session, skip: int = 0, limit: int = 15) -> List[TurnoOut]:
     turnos = db.query(Turno).offset(skip).limit(limit).all()
@@ -21,7 +39,18 @@ def create_turno(db: Session, turno: TurnoCreate) -> TurnoSchema:
     # Convertir el objeto time a string antes de guardar
     turno_data = turno.dict()
     turno_data['hora'] = turno.hora.strftime("%H:%M:%S")  # ✅ Convertir time a string
-    
+
+    # Evitar doble reserva: si ya hay un turno activo en esa fecha y hora, rechazar.
+    ya_ocupado = (
+        db.query(Turno)
+        .filter(func.date(Turno.fecha) == turno_data['fecha'].isoformat())
+        .filter(Turno.hora == turno_data['hora'])
+        .filter(Turno.estado.in_(ESTADOS_QUE_OCUPAN_HORARIO))
+        .first()
+    )
+    if ya_ocupado:
+        raise ValueError("Ese horario ya fue reservado. Por favor elegí otro.")
+
     db_turno = Turno(**turno_data)
     db.add(db_turno)
     db.commit()

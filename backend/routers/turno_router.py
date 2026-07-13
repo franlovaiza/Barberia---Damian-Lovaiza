@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from typing import List, Optional
+from datetime import date
 from db.dependencies import get_db
 from schemas.turno_schema import TurnoCreate, TurnoSchema, TurnoOut
 from services.turno_service import (
@@ -9,15 +10,29 @@ from services.turno_service import (
     create_turno,
     update_turno,
     delete_turno,
-    get_all_turnos_paginated
+    get_all_turnos_paginated,
+    get_horarios_ocupados,
 )
 from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/turnos", tags=["Turnos"])
 
+# IMPORTANTE: las rutas con texto fijo (/paginado, /ocupados) van ANTES que /{id},
+# porque FastAPI matchea en orden y si no, "paginado"/"ocupados" se interpretarían
+# como si fueran un id numérico y tirarían error 422.
+
 @router.get("/", response_model=List[TurnoOut])
 def listar_turnos(session: Session = Depends(get_db)):
     return get_turnos(session)
+
+@router.get("/paginado", response_model=List[TurnoOut])
+def turnos_paginado(skip: int = 0, limit: int = 15, session: Session = Depends(get_db)):
+    return get_all_turnos_paginated(session, skip=skip, limit=limit)
+
+@router.get("/ocupados")
+def horarios_ocupados(fecha: date, session: Session = Depends(get_db)):
+    """Devuelve la lista de horarios (HH:MM) ya reservados para una fecha dada."""
+    return {"fecha": str(fecha), "horarios": get_horarios_ocupados(session, fecha)}
 
 @router.get("/{id}", response_model=TurnoSchema)
 def obtener_turno(id: int, session: Session = Depends(get_db)):
@@ -29,7 +44,10 @@ def obtener_turno(id: int, session: Session = Depends(get_db)):
 
 @router.post("/", response_model=TurnoSchema, status_code=201)
 def crear_turno(turno: TurnoCreate, session: Session = Depends(get_db)):
-    return create_turno(session, turno)
+    try:
+        return create_turno(session, turno)
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e))
 
 @router.put("/{id}", response_model=TurnoSchema)
 def actualizar_turno(id: int, turno: TurnoCreate, session: Session = Depends(get_db)):
@@ -46,7 +64,3 @@ def eliminar_turno(id: int, session: Session = Depends(get_db)):
         return {"message": "Turno eliminado"}
     else:
         return JSONResponse(content={"error": "Turno no encontrado"}, status_code=404)
-
-@router.get("/paginado", response_model=List[TurnoOut])
-def turnos_paginado(skip: int = 0, limit: int = 15, session: Session = Depends(get_db)):
-    return get_all_turnos_paginated(session, skip=skip, limit=limit)

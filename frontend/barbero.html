@@ -99,7 +99,7 @@
             document.getElementById('errorMessage').style.display = 'none';
             document.getElementById('spinnerWrapper').style.display = 'block';
             try {
-                const res = await fetch("http://127.0.0.1:8000/turnos/"); // Obtener todos los turnos
+                const res = await fetch(`${window.apiUrl}/turnos/`); // Obtener todos los turnos
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data = await res.json();
                 console.log(data);
@@ -169,7 +169,7 @@
                         btnBorrar.onclick = async () => {
                             if (confirm("¿Seguro que querés eliminar este turno?")) {
                                 try {
-                                    const res = await fetch(`http://127.0.0.1:8000/turnos/${turno.id}`, {
+                                    const res = await fetch(`${window.apiUrl}/turnos/${turno.id}`, {
                                         method: "DELETE"
                                     });
                                     if (res.ok) {
@@ -203,7 +203,7 @@
             } catch (error) {
                 console.error("Error al cargar turnos:", error);
                 const em = document.getElementById('errorMessage');
-                em.textContent = 'No se pudo conectar con el servidor. Verifica que el backend esté corriendo en http://127.0.0.1:8000';
+                em.textContent = `No se pudo conectar con el servidor (${window.apiUrl || 'sin configurar'}). Verificá que el backend esté funcionando.`;
                 em.style.display = 'block';
             } finally {
                 document.getElementById('spinnerWrapper').style.display = 'none';
@@ -214,7 +214,14 @@
             localStorage.removeItem("autenticado");
             window.location.href = "login.html";
         }
+    </script>
 
+    <!-- Este script va al final (y es type="module") para poder importar config.js.
+        Los scripts module se ejecutan después de los normales, así que acá ya
+        existen cargarTurnos() y demás funciones, y recién ahora arrancamos todo. -->
+    <script type="module">
+        import { API_URL } from './config.js';
+        window.apiUrl = API_URL;
         cargarTurnos();
     </script>
 
