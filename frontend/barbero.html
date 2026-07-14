@@ -48,6 +48,29 @@
         .turno-meta { font-size: 0.9em; color: #ddd; }
         .turno-actions { margin-left: 12px; }
 
+        /* Estado visual del turno: próximo vs ya pasado */
+        .day-group li.turno-proximo {
+            border-left: 5px solid #2ea043;
+            background: #354a38;
+        }
+        .day-group li.turno-pasado {
+            border-left: 5px solid #6b6b6b;
+            background: #333333;
+            opacity: 0.75;
+        }
+        .badge-estado {
+            display: inline-block;
+            font-size: 0.72em;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 8px;
+            vertical-align: middle;
+            letter-spacing: 0.3px;
+        }
+        .badge-proximo { background: #2ea043; color: #fff; }
+        .badge-pasado { background: #6b6b6b; color: #eee; }
+
         /* Simple spinner */
         .spinner {
             display: inline-block;
@@ -151,12 +174,22 @@
 
                     turnosAgrupados[fecha].forEach(turno => {
                         const li = document.createElement("li");
+
+                        // Determinar si el turno ya pasó comparando fecha+hora con el momento actual
+                        const horaFmt = formatHora(turno.hora) || '00:00';
+                        const turnoDateTime = new Date(`${fecha}T${horaFmt}:00`);
+                        const yaPaso = !isNaN(turnoDateTime.getTime()) && turnoDateTime < new Date();
+                        li.classList.add(yaPaso ? 'turno-pasado' : 'turno-proximo');
+
                         const wrapper = document.createElement('div');
                         wrapper.className = 'turno-item';
 
                         const info = document.createElement('div');
                         info.className = 'turno-info';
-                        info.innerHTML = `<strong>${formatHora(turno.hora)} — ${turno.nombre} (${turno.tipo_turno || ''})</strong>`;
+                        const badge = yaPaso
+                            ? '<span class="badge-estado badge-pasado">Ya pasó</span>'
+                            : '<span class="badge-estado badge-proximo">Próximo</span>';
+                        info.innerHTML = `<strong>${formatHora(turno.hora)} — ${turno.nombre} (${turno.tipo_turno || ''})${badge}</strong>`;
                         const meta = document.createElement('div');
                         meta.className = 'turno-meta';
                         meta.textContent = `${turno.telefono || ''} • ${turno.email || ''}`;
