@@ -192,7 +192,8 @@
                         info.innerHTML = `<strong>${formatHora(turno.hora)} — ${turno.nombre} (${turno.tipo_turno || ''})${badge}</strong>`;
                         const meta = document.createElement('div');
                         meta.className = 'turno-meta';
-                        meta.textContent = `${turno.telefono || ''} • ${turno.email || ''}`;
+                        const pagoIcono = (turno.metodo_pago === 'Transferencia') ? '🏦' : '💵';
+                        meta.textContent = `${turno.telefono || ''} • ${turno.email || ''} • ${pagoIcono} ${turno.metodo_pago || 'Efectivo'}`;
                         info.appendChild(meta);
 
                         const actions = document.createElement('div');

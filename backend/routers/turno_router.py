@@ -42,10 +42,14 @@ def obtener_turno(id: int, session: Session = Depends(get_db)):
     else:
         return JSONResponse(content={"error": "Turno no encontrado"}, status_code=404)
 
+from services.email_service import enviar_confirmacion_turno
+
 @router.post("/", response_model=TurnoSchema, status_code=201)
 def crear_turno(turno: TurnoCreate, session: Session = Depends(get_db)):
     try:
-        return create_turno(session, turno)
+        nuevo_turno = create_turno(session, turno)
+        enviar_confirmacion_turno(nuevo_turno)
+        return nuevo_turno
     except ValueError as e:
         raise HTTPException(status_code=409, detail=str(e))
 

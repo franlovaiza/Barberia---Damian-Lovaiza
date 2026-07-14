@@ -13,6 +13,7 @@ class Turno(Base):
     fecha = Column(DateTime)
     hora = Column(String(10))
     estado = Column(String(20), default="Reservado")
+    metodo_pago = Column(String(20), default="Efectivo")
     observaciones = Column(String(200), nullable=True)
 
     # Timestamps

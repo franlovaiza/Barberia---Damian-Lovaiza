@@ -193,6 +193,10 @@
                         <select class="w-full form-input px-4 py-3 border border-gray-300 rounded-lg focus:outline-none">
                             <option selected disabled>Selecciona un servicio</option>
                             <option>Corte de Cabello</option>
+                            <option>Corte de Cabello + Barba</option>
+                            <option>Perfilado de Cejas</option>
+                            <option>Color Global</option>
+                            <option>Mechas</option>
                         </select>
                     </div>
                     
@@ -218,7 +222,24 @@
                         <label class="block text-gray-700 font-semibold mb-2">Mensaje (Opcional)</label>
                         <textarea rows="4" class="w-full form-input px-4 py-3 border border-gray-300 rounded-lg focus:outline-none"></textarea>
                     </div>
-                    
+
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">¿Cómo vas a pagar?</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="metodo-pago-opcion flex items-center justify-center gap-2 border border-gray-300 rounded-lg px-4 py-3 cursor-pointer">
+                                <input type="radio" name="metodo_pago" value="Efectivo" checked class="accent-black">
+                                <span>💵 Efectivo</span>
+                            </label>
+                            <label class="metodo-pago-opcion flex items-center justify-center gap-2 border border-gray-300 rounded-lg px-4 py-3 cursor-pointer">
+                                <input type="radio" name="metodo_pago" value="Transferencia" class="accent-black">
+                                <span>🏦 Transferencia</span>
+                            </label>
+                        </div>
+                        <div id="datosTransferencia" class="hidden mt-3 bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3 text-sm text-gray-700">
+                            Transferí a <strong>Naranja X</strong>, alias: <strong>LOVAIZADL</strong>
+                        </div>
+                    </div>
+
                     <button type="submit" class="w-full btn-primary text-white py-4 rounded-lg font-semibold text-lg">
                         Confirmar Reserva
                     </button>
@@ -288,6 +309,14 @@ function validarEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+// Mostrar/ocultar el alias según el método de pago elegido
+document.querySelectorAll('input[name="metodo_pago"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        const cartel = document.getElementById('datosTransferencia');
+        cartel.classList.toggle('hidden', this.value !== 'Transferencia');
+    });
+});
+
 document.getElementById('turnoForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
@@ -296,6 +325,7 @@ document.getElementById('turnoForm').addEventListener('submit', async function(e
     const email = this.querySelector('input[type="email"]').value.trim();
     const tipo_turno = this.querySelector('select').value;
     const fecha = this.querySelector('input[type="date"]').value.trim();
+    const metodo_pago = this.querySelector('input[name="metodo_pago"]:checked').value;
 
     let mensaje = "";
     if (!nombre) mensaje += "El nombre es obligatorio.\n";
@@ -329,7 +359,8 @@ document.getElementById('turnoForm').addEventListener('submit', async function(e
                 email: email,
                 tipo_turno: tipo_turno,
                 fecha: fecha,
-                hora: hora
+                hora: hora,
+                metodo_pago: metodo_pago
             })
         });
 
@@ -442,9 +473,31 @@ document.getElementById('turnoForm').addEventListener('submit', async function(e
         // });
 
         function mostrarMensaje(texto, tipo = "error") {
+            console.log("MOSTRAR MENSAJE FUE LLAMADO CON:", texto, tipo);
             const mensajeReserva = document.getElementById("mensajeReserva");
+            if (!texto) {
+                mensajeReserva.textContent = "";
+                mensajeReserva.style.display = "none";
+                return;
+            }
             mensajeReserva.textContent = texto;
-            mensajeReserva.className = tipo === "ok" ? "text-center text-green-500 mt-4" : "text-center text-red-500 mt-4";
+            mensajeReserva.style.display = "block";
+            mensajeReserva.style.textAlign = "center";
+            mensajeReserva.style.marginTop = "16px";
+            mensajeReserva.style.padding = "16px";
+            mensajeReserva.style.borderRadius = "8px";
+            mensajeReserva.style.fontWeight = "600";
+            mensajeReserva.style.fontSize = "1.1rem";
+            if (tipo === "ok") {
+                mensajeReserva.style.backgroundColor = "#d1fae5";
+                mensajeReserva.style.color = "#065f46";
+                mensajeReserva.style.border = "2px solid #34d399";
+            } else {
+                mensajeReserva.style.backgroundColor = "#fee2e2";
+                mensajeReserva.style.color = "#991b1b";
+                mensajeReserva.style.border = "2px solid #f87171";
+            }
+            mensajeReserva.scrollIntoView({ behavior: "smooth", block: "center" });
         }
 
         // Smooth scrolling para los links de navegación

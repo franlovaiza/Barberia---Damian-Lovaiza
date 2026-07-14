@@ -10,6 +10,7 @@ class TurnoBase(BaseModel):
     fecha: date
     hora: time
     estado: str = "Reservado"
+    metodo_pago: str = "Efectivo"
     observaciones: Optional[str] = None
 
 class TurnoCreate(TurnoBase):

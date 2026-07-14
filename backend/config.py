@@ -10,14 +10,12 @@ class Settings(BaseSettings):
     TOKEN_SECRET: str
     TOKEN_HOURS_DURATION: int
 
-    # Configuración de envío de mails.
-    # Optional para que el backend no se caiga si en algún entorno faltan estas variables.
-    MAIL_USERNAME: Optional[str] = None
-    MAIL_PASSWORD: Optional[str] = None
+    # Configuración de envío de mails con Resend.
+    # Optional para que el backend no se caiga si en algún entorno faltan estas variables
+    # (por ejemplo, en tu compu si todavía no las cargaste en el .env).
+    RESEND_API_KEY: Optional[str] = None
     MAIL_FROM: Optional[str] = None
-    MAIL_PORT: Optional[int] = None
-    MAIL_SERVER: Optional[str] = None
-
+    
     class Config:
         # Asegura que Pydantic lea el archivo .env que está junto a este archivo (backend/.env)
         env_file = str(Path(__file__).resolve().parent / '.env')
