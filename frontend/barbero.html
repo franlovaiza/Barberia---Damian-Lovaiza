@@ -196,6 +196,14 @@
                         meta.textContent = `${turno.telefono || ''} • ${turno.email || ''} • ${pagoIcono} ${turno.metodo_pago || 'Efectivo'}`;
                         info.appendChild(meta);
 
+                        if (turno.observaciones && turno.observaciones.trim()) {
+                            const obs = document.createElement('div');
+                            obs.className = 'turno-meta';
+                            obs.style.fontStyle = 'italic';
+                            obs.textContent = `💬 "${turno.observaciones.trim()}"`;
+                            info.appendChild(obs);
+                        }
+
                         const actions = document.createElement('div');
                         actions.className = 'turno-actions';
                         const btnBorrar = document.createElement("button");

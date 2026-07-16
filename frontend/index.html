@@ -3,61 +3,328 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Damian Lovaiza - Barberia</title>
+    <title>Damián Lovaiza - Barbería</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        .hero-bg {
-            background: linear-gradient(135deg, #000 0%, white 100%);
-        }
-        .btn-primary {
-            background: linear-gradient(45deg, #000, white);
-            transition: all 0.3s ease;
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-        .form-input:focus {
-            border-color: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        .social-hover:hover {
-            transform: scale(1.1);
-            transition: transform 0.3s ease;
-        }
-        .sticky-header {
-            backdrop-filter: none;
-            background: #1f2937;
+        :root {
+            --ink: #141110;
+            --ink-soft: #1b1613;
+            --panel: rgba(28, 23, 20, 0.72);
+            --panel-border: rgba(198, 156, 79, 0.35);
+            --gold: #c69c4f;
+            --gold-bright: #d9b25f;
+            --gold-deep: #a97c2f;
+            --cream: #f2e6cf;
+            --taupe: #b7ac9a;
+            --taupe-dim: #8a8478;
+            --barber-red: #963c3c;
         }
 
-        /* Por defecto: links negros */
+        * { box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            background: var(--ink);
+            color: var(--taupe);
+        }
+
+        h1, h2, h3, .font-display {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .eyebrow {
+            font-family: 'Poppins', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            font-size: 0.75rem;
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        /* ---------- Header ---------- */
+        header {
+            background: transparent;
+            transition: background-color 0.4s ease, backdrop-filter 0.4s ease, box-shadow 0.4s ease, padding 0.4s ease;
+        }
+        header.sticky-header {
+            background: rgba(20, 17, 16, 0.92);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+        }
         .nav-link {
-            color: #000;
-            transition: color 0.3s ease;
+            color: var(--cream);
+            transition: color 0.25s ease;
+            position: relative;
+        }
+        .nav-link:hover { color: var(--gold-bright); }
+        .nav-link::after {
+            content: "";
+            position: absolute;
+            left: 0; bottom: -4px;
+            width: 0%;
+            height: 1px;
+            background: var(--gold);
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after { width: 100%; }
+
+        #mobileMenu {
+            background: rgba(15, 12, 11, 0.97);
+            backdrop-filter: blur(6px);
         }
 
-        /* Cuando el header tiene la clase sticky-header, los links pasan a blanco */
-        .sticky-header .nav-link {
-            color: #fff;
+        /* ---------- Barber pole (elemento de firma) ---------- */
+        .barber-pole {
+            width: 16px;
+            height: 76px;
+            border-radius: 999px;
+            overflow: hidden;
+            box-shadow: 0 0 0 2px rgba(242,230,207,0.15), 0 8px 20px rgba(0,0,0,0.5);
+            flex-shrink: 0;
+        }
+        .barber-pole__stripes {
+            width: 100%;
+            height: 220%;
+            background: repeating-linear-gradient(
+                45deg,
+                var(--barber-red) 0px, var(--barber-red) 10px,
+                var(--cream) 10px, var(--cream) 20px,
+                var(--gold) 20px, var(--gold) 30px
+            );
+            animation: pole-spin 2.2s linear infinite;
+        }
+        @keyframes pole-spin {
+            from { transform: translateY(-53.33%); }
+            to   { transform: translateY(0%); }
         }
 
-        .nav-link:hover {
-            color: white; /* Tailwind purple-600 */
-}
+        /* ---------- Hero ---------- */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            background-image:
+                linear-gradient(180deg, rgba(10,8,7,0.55) 0%, rgba(10,8,7,0.72) 55%, var(--ink) 100%),
+                url('image0.jpeg');
+            background-size: cover;
+            background-position: center 20%;
+        }
+        .hero-content {
+            opacity: 0;
+            transform: translateY(18px);
+            animation: hero-in 0.9s ease 0.15s forwards;
+        }
+        @keyframes hero-in {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .hero h1 {
+            font-size: clamp(2.6rem, 6vw, 4.5rem);
+            color: var(--cream);
+            line-height: 1.05;
+        }
+        .hero .tagline {
+            color: var(--taupe);
+            font-size: clamp(1rem, 2vw, 1.25rem);
+        }
 
+        .btn-gold {
+            background: linear-gradient(135deg, var(--gold-bright) 0%, var(--gold-deep) 100%);
+            color: #1a1410;
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+        }
+        .btn-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(201, 156, 79, 0.35);
+            filter: brightness(1.05);
+        }
+        .btn-gold:active { transform: translateY(0); }
+        .btn-gold:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
+        .btn-outline-gold {
+            border: 1px solid var(--panel-border);
+            color: var(--cream);
+            transition: border-color 0.25s ease, background 0.25s ease;
+        }
+        .btn-outline-gold:hover {
+            border-color: var(--gold);
+            background: rgba(198,156,79,0.08);
+        }
+
+        .scroll-cue {
+            animation: bob 2s ease-in-out infinite;
+        }
+        @keyframes bob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(8px); }
+        }
+
+        /* ---------- Secciones oscuras ---------- */
+        .section-ink { background: var(--ink); }
+        .section-soft { background: var(--ink-soft); }
+
+        .glass-card {
+            background: var(--panel);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+        }
+
+        .stat-number {
+            font-family: 'Playfair Display', serif;
+            color: var(--gold);
+            font-size: 2.2rem;
+        }
+
+        /* ---------- Formulario ---------- */
+        .form-label {
+            color: var(--cream);
+            font-weight: 500;
+            font-size: 0.9rem;
+            letter-spacing: 0.02em;
+        }
+        .form-input {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.14);
+            color: var(--cream);
+            transition: border-color 0.25s ease, background 0.25s ease;
+        }
+        .form-input::placeholder { color: var(--taupe-dim); }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            background: rgba(255,255,255,0.08);
+            box-shadow: 0 0 0 3px rgba(198, 156, 79, 0.25);
+        }
+        select.form-input option { background: var(--ink-soft); color: var(--cream); }
+
+        .btn-gold:focus-visible,
+        .btn-outline-gold:focus-visible,
+        .horario-btn:focus-visible,
+        .nav-link:focus-visible {
+            outline: 2px solid var(--gold-bright);
+            outline-offset: 3px;
+        }
+
+        .horario-btn {
+            padding: 0.55rem 0.5rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.16);
+            color: var(--taupe);
+            background: rgba(255,255,255,0.03);
+            font-size: 0.9rem;
+            transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+        }
+        .horario-btn:hover {
+            border-color: var(--gold);
+            color: var(--cream);
+        }
+        .horario-btn--selected {
+            background: linear-gradient(135deg, var(--gold-bright), var(--gold-deep));
+            color: #1a1410;
+            border-color: transparent;
+            font-weight: 600;
+            transform: translateY(-1px);
+        }
+
+        .metodo-pago-opcion {
+            border-color: rgba(255,255,255,0.14) !important;
+            color: var(--taupe);
+            transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+        }
+        .metodo-pago-opcion:has(input:checked) {
+            border-color: var(--gold) !important;
+            background: rgba(198,156,79,0.1);
+            color: var(--cream);
+        }
+        #datosTransferencia {
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            padding-top: 0; padding-bottom: 0;
+            margin-top: 0;
+            transition: max-height 0.35s ease, opacity 0.3s ease, margin-top 0.3s ease, padding 0.3s ease;
+        }
+        #datosTransferencia.abierto {
+            max-height: 80px;
+            opacity: 1;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem; padding-bottom: 0.75rem;
+        }
+
+        /* ---------- Footer ---------- */
+        footer {
+            background: var(--ink-soft);
+            border-top: 1px solid rgba(198,156,79,0.18);
+        }
+        .footer-icon {
+            color: var(--gold);
+            transition: color 0.25s ease, transform 0.25s ease;
+        }
+        .footer-icon:hover { transform: translateX(3px); }
+        .footer-icon--whatsapp:hover { color: #3fbf62; }
+        .footer-icon--instagram:hover { color: #e0679b; }
+
+        /* ---------- Toast de confirmación (fijo, siempre visible) ---------- */
+        #mensajeReserva {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            z-index: 9999;
+            max-width: min(90vw, 420px);
+            transform: translateX(-50%) translateY(-30px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease, transform 0.35s ease;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.45);
+        }
+        #mensajeReserva.toast-visible {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            #mensajeReserva { transition: opacity 0.15s ease; transform: translateX(-50%) !important; }
+        }
+
+        /* ---------- Reveal on scroll ---------- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+        .reveal.is-visible {
+            opacity: 1;
+            transform: none;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .barber-pole__stripes, .scroll-cue, .hero-content { animation: none !important; }
+            .hero-content { opacity: 1; transform: none; }
+            .reveal { opacity: 1; transform: none; transition: none; }
+        }
     </style>
 </head>
-<body class="font-sans bg-gray-50">
+<body class="font-sans">
+    <p id="mensajeReserva"></p>
     <!-- Header con Navegación -->
-    <header class="fixed w-full z-50 sticky-header shadow-sm">
+    <header class="fixed w-full z-50">
         <nav class="container mx-auto px-6 py-4">
             <div class="flex justify-between items-center">
                 <!-- Logo -->
-                <div class="flex items-center space-x-2">
-                    <img src="logo1.png" alt="Logo" class="h-12 w-auto">
-                    <span class="text-xl font-bold text-gray-800"></span>
+                <div class="flex items-center space-x-3">
+                    <img src="logo1.png" alt="Logo Barbería Damián Lovaiza" class="h-12 w-auto">
                 </div>
 
                 <!-- Links de Navegación -->
@@ -73,15 +340,15 @@
                         <i class="fas fa-user"></i>
                         <span class="hidden md:inline ml-2">Login</span>
                     </a>
-                    <button id="menuBtn" class="md:hidden">
-                        <i class="fas fa-bars text-gray-700 text-xl"></i>
+                    <button id="menuBtn" class="md:hidden text-2xl" style="color: var(--cream);">
+                        <i class="fas fa-bars"></i>
                     </button>
                     <!-- Menú móvil -->
-                    <div id="mobileMenu" class="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-90 flex flex-col items-center justify-center space-y-8 z-50 hidden">
-                        <a href="#peluquero" class="nav-link text-white text-2xl">Nuestro Barbero</a>
-                        <a href="#turnos" class="nav-link text-white text-2xl">Sacar Turno</a>
-                        <a href="#contacto" class="nav-link text-white text-2xl">Contacto</a>
-                        <button id="closeMenu" class="mt-8 text-white text-3xl">
+                    <div id="mobileMenu" class="fixed top-0 left-0 w-full h-full flex flex-col items-center justify-center space-y-8 z-50 hidden">
+                        <a href="#peluquero" class="nav-link text-2xl">Nuestro Barbero</a>
+                        <a href="#turnos" class="nav-link text-2xl">Sacar Turno</a>
+                        <a href="#contacto" class="nav-link text-2xl">Contacto</a>
+                        <button id="closeMenu" class="mt-8 text-3xl" style="color: var(--gold);">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
@@ -110,52 +377,56 @@
         </nav>
     </header>
 
-<!-- Hero Section 
-    <section id="inicio" class="pt-24 hero-bg text-white">
-        <div class="container mx-auto px-6 py-20">
-            <div class="flex flex-col md:flex-row items-center">
-                <div class="md:w-1/2 mb-10 md:mb-0">
-                    <h1 class="text-4xl md:text-6xl font-bold mb-6">Transforma tu Estilo con</h1>
-                    <h2 class="text-3xl md:text-5xl font-light mb-8">Expertos en Belleza Capilar</h2>
-                    <p class="text-xl mb-8 opacity-90">Donde cada corte cuenta una historia y cada color expresa personalidad.</p>
-                    <a href="#turnos" class="btn-primary text-white px-8 py-4 rounded-full font-semibold inline-block">
-                        Reservar Ahora
-                    </a>
+    <!-- Hero -->
+    <section id="inicio" class="hero">
+        <div class="container mx-auto px-6">
+            <div class="hero-content max-w-2xl flex items-center gap-6">
+                <div class="barber-pole hidden sm:block">
+                    <div class="barber-pole__stripes"></div>
                 </div>
-                <div class="md:w-1/2">
-                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/9c66b0eb-0380-46d4-8184-7931cf9a174a.png" alt="Elegante salón de peluquería moderno con espejos iluminados, sillas profesionales y herramientas de estilismo" class="rounded-lg shadow-xl">
+                <div>
+                    <p class="eyebrow mb-3">Barbería en Carrilobo, Córdoba</p>
+                    <h1 class="font-bold mb-4">Damián<br>Lovaiza</h1>
+                    <p class="tagline mb-8">Cada corte cuenta una historia. Cortes, barba y color con la dedicación de siempre — ahora, con turno online.</p>
+                    <div class="flex flex-wrap gap-4 items-center">
+                        <a href="#turnos" class="btn-gold px-8 py-4 rounded-full inline-block">Reservar Turno</a>
+                        <a href="#peluquero" class="btn-outline-gold px-8 py-4 rounded-full inline-block">Conocer más</a>
+                    </div>
                 </div>
             </div>
         </div>
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 scroll-cue" style="color: var(--taupe-dim);">
+            <i class="fas fa-chevron-down"></i>
+        </div>
     </section>
--->
+
     <!-- Sección del Peluquero -->
-    <section id="peluquero" class="pt-40 pb-20 bg-[url('image0.jpeg')] bg-cover bg-center relative">
+    <section id="peluquero" class="section-ink py-24">
         <div class="container mx-auto px-6">
-            <div class="flex flex-col md:flex-row items-center">
-                <div class="md:w-1/2 mb-10 md:mb-0">
-                    <img src="image2.jpeg" alt="Profesional peluquero estilista sonriente con herramientas de trabajo en un salón elegante y moderno" class="rounded-lg shadow-lg w-full max-w-xs mx-auto">
+            <div class="flex flex-col md:flex-row items-center gap-10 reveal">
+                <div class="md:w-1/3 w-full">
+                    <img src="image2.jpeg" alt="Damián Lovaiza, barbero, con tijera en mano en su local" class="rounded-2xl shadow-2xl w-full max-w-xs mx-auto" style="border: 1px solid var(--panel-border);">
                 </div>
-                <div class="md:w-3/4 w-full bg-white/60 rounded-xl shadow-lg p-8 md:ml-12 mx-auto">
-                    <h2 class="text-3xl md:text-4xl font-bold text-black-800 mb-6">Conoce al peluquero que transforma cada look</h2>
-                    <h3 class="text-xl text-black font-semibold mb-4">Damián Lovaiza</h3>
-                    <p class="text-gray-600 mb-6 text-lg">
+                <div class="md:w-2/3 w-full glass-card p-8 md:p-10">
+                    <p class="eyebrow mb-2">Conocé al barbero</p>
+                    <h2 class="text-3xl md:text-4xl font-bold mb-6" style="color: var(--cream);">Damián Lovaiza</h2>
+                    <p class="mb-5 leading-relaxed">
                         Barbero por pasión y por elección. En cada corte busco algo más que un buen look: quiero que salgas sintiéndote renovado, seguro de vos mismo y listo para lo que venga.<br>
                         Mi barbería es mucho más que una silla y una tijera: es un espacio pensado para vos, para que frenes un rato, te relajes y disfrutes de un buen momento.<br>
                         Acá se mezcla buena charla, música, estilo y dedicación en cada detalle.
                     </p>
-                    <p class="text-gray-600 mb-8 text-lg">
+                    <p class="mb-8 leading-relaxed">
                         Creo que cada persona merece un corte que lo represente y lo haga sentir único. Por eso trabajo escuchando lo que querés y sumándole mi toque personal, para que salgas con la mejor versión de vos.<br>
-                        Sacá tu turno, venite y viví la experiencia. Te espero para compartir un buen corte, una afeitada prolija o simplemente un rato entre amigos.
+                        Sacá tu turno, venite y viví la experiencia. Te espero para compartir un buen corte, una afeitada prolija o simplemente un rato entre amigos.
                     </p>
-                    <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div class="grid grid-cols-2 gap-4">
                         <div class="text-center">
-                            <div class="text-3xl font-bold text-black-600">5+</div>
-                            <div class="text-gray-600">Años de Experiencia</div>
+                            <div class="stat-number">5+</div>
+                            <div class="text-sm" style="color: var(--taupe-dim);">Años de Experiencia</div>
                         </div>
                         <div class="text-center">
-                            <div class="text-3xl font-bold text-black-600">500+</div>
-                            <div class="text-gray-600">Clientes Satisfechos</div>
+                            <div class="stat-number">500+</div>
+                            <div class="text-sm" style="color: var(--taupe-dim);">Clientes Satisfechos</div>
                         </div>
                     </div>
                 </div>
@@ -164,33 +435,34 @@
     </section>
 
     <!-- Sección de Turnos -->
-    <section id="turnos" class="py-20 bg-gray-100">
+    <section id="turnos" class="section-soft py-24">
         <div class="container mx-auto px-6">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Reserva tu Turno</h2>
-                <p class="text-gray-600 text-xl">Elije el servicio perfecto y agenda tu cita</p>
+            <div class="text-center mb-12 reveal">
+                <p class="eyebrow mb-2">Reservá en menos de un minuto</p>
+                <h2 class="text-3xl md:text-4xl font-bold mb-4" style="color: var(--cream);">Reserva tu Turno</h2>
+                <p class="text-lg" style="color: var(--taupe);">Elegí el servicio perfecto y agendá tu cita</p>
             </div>
 
-            <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-8">
+            <div class="max-w-2xl mx-auto glass-card p-8 reveal">
                 <form id="turnoForm" class="space-y-6">
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">Nombre Completo</label>
-                        <input type="text" required class="w-full form-input px-4 py-3 border border-gray-300 rounded-lg focus:outline-none">
+                        <label class="block form-label mb-2">Nombre Completo</label>
+                        <input type="text" required class="form-input px-4 py-3 rounded-lg" placeholder="Tu nombre">
                     </div>
-                    
+
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">Teléfono</label>
-                        <input type="tel" required class="w-full form-input px-4 py-3 border border-gray-300 rounded-lg focus:outline-none">
+                        <label class="block form-label mb-2">Teléfono</label>
+                        <input type="tel" required class="form-input px-4 py-3 rounded-lg" placeholder="Solo números">
                     </div>
-                    
+
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">Email</label>
-                        <input type="email" required class="w-full form-input px-4 py-3 border border-gray-300 rounded-lg focus:outline-none">
+                        <label class="block form-label mb-2">Email</label>
+                        <input type="email" required class="form-input px-4 py-3 rounded-lg" placeholder="tu@email.com">
                     </div>
-                    
+
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">Servicio</label>
-                        <select class="w-full form-input px-4 py-3 border border-gray-300 rounded-lg focus:outline-none">
+                        <label class="block form-label mb-2">Servicio</label>
+                        <select class="form-input px-4 py-3 rounded-lg">
                             <option selected disabled>Selecciona un servicio</option>
                             <option>Corte de Cabello</option>
                             <option>Corte de Cabello + Barba</option>
@@ -199,306 +471,225 @@
                             <option>Mechas</option>
                         </select>
                     </div>
-                    
-                    <!--div>
-                        <label class="block text-gray-700 font-semibold mb-2">Fecha y Hora</label>
-                        <input type="datetime-local" required class="w-full form-input px-4 py-3 border border-gray-300 rounded-lg focus:outline-none">
-                    </div-->
-                    <div>
-                        <label class="block text-gray-700 font-semibold mb-2">Fecha</label>
-                        <input 
-                            type="date" 
-                            id="fecha" 
-                            required 
-                            class="w-full form-input px-4 py-3 border border-gray-300 rounded-lg focus:outline-none">
 
-                        <label class="block text-gray-700 font-semibold mt-4 mb-2">Horarios disponibles</label>
+                    <div>
+                        <label class="block form-label mb-2">Fecha</label>
+                        <input
+                            type="date"
+                            id="fecha"
+                            required
+                            class="form-input px-4 py-3 rounded-lg">
+
+                        <label class="block form-label mt-4 mb-2">Horarios disponibles</label>
                         <div id="horarios" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                             <!-- Aquí se generan los botones -->
                         </div>
                     </div>
-                    
+
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">Mensaje (Opcional)</label>
-                        <textarea rows="4" class="w-full form-input px-4 py-3 border border-gray-300 rounded-lg focus:outline-none"></textarea>
+                        <label class="block form-label mb-2">Mensaje (Opcional)</label>
+                        <textarea id="observaciones" rows="4" class="form-input px-4 py-3 rounded-lg" placeholder="Alguna aclaración para tu turno..." maxlength="200"></textarea>
                     </div>
 
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">¿Cómo vas a pagar?</label>
+                        <label class="block form-label mb-2">¿Cómo vas a pagar?</label>
                         <div class="grid grid-cols-2 gap-3">
-                            <label class="metodo-pago-opcion flex items-center justify-center gap-2 border border-gray-300 rounded-lg px-4 py-3 cursor-pointer">
-                                <input type="radio" name="metodo_pago" value="Efectivo" checked class="accent-black">
+                            <label class="metodo-pago-opcion flex items-center justify-center gap-2 border rounded-lg px-4 py-3 cursor-pointer">
+                                <input type="radio" name="metodo_pago" value="Efectivo" checked class="accent-[#c69c4f]">
                                 <span>💵 Efectivo</span>
                             </label>
-                            <label class="metodo-pago-opcion flex items-center justify-center gap-2 border border-gray-300 rounded-lg px-4 py-3 cursor-pointer">
-                                <input type="radio" name="metodo_pago" value="Transferencia" class="accent-black">
+                            <label class="metodo-pago-opcion flex items-center justify-center gap-2 border rounded-lg px-4 py-3 cursor-pointer">
+                                <input type="radio" name="metodo_pago" value="Transferencia" class="accent-[#c69c4f]">
                                 <span>🏦 Transferencia</span>
                             </label>
                         </div>
-                        <div id="datosTransferencia" class="hidden mt-3 bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3 text-sm text-gray-700">
+                        <div id="datosTransferencia" class="rounded-lg px-4 text-sm" style="background: rgba(198,156,79,0.1); border: 1px solid var(--panel-border); color: var(--cream);">
                             Transferí a <strong>Naranja X</strong>, alias: <strong>LOVAIZADL</strong>
                         </div>
                     </div>
 
-                    <button type="submit" class="w-full btn-primary text-white py-4 rounded-lg font-semibold text-lg">
+                    <button type="submit" class="w-full btn-gold py-4 rounded-lg text-lg">
                         Confirmar Reserva
                     </button>
                 </form>
-                <!-- Agrega debajo del formulario -->
-                <p id="mensajeReserva" class="text-center text-red-500 mt-4"></p>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer id="contacto" class="bg-gray-800 text-white py-12">
+    <footer id="contacto" class="py-12">
         <div class="container mx-auto px-6">
-            <div class="grid md:grid-cols-3 gap-8">
+            <div class="grid md:grid-cols-3 gap-8 reveal">
                 <div>
-                    <h3 class="text-xl font-bold mb-4">Barberia - Damián Lovaiza</h3>
-                    <p class="text-gray-300 mb-4">Transformando tu estilo desde 2021</p>
-                    <p class="text-gray-400">Semana Santa 548<br>Carrilobo, Córdoba</p>
+                    <h3 class="text-xl font-bold mb-4" style="color: var(--cream);">Barbería Damián Lovaiza</h3>
+                    <p class="mb-4" style="color: var(--taupe);">Transformando tu estilo desde 2021</p>
+                    <p style="color: var(--taupe-dim);">Semana Santa 548<br>Carrilobo, Córdoba</p>
                 </div>
-                
+
                 <div>
-                    <h3 class="text-xl font-bold mb-4">Horarios</h3>
-                    <p class="text-gray-300">Martes a Sabado: 09:00 - 12:30<br>15:00 - 20:30</p>
-                    <p class="text-gray-300"> </p>
-                    <p class="text-gray-300">Lunes y Domingos: Cerrado</p>
+                    <h3 class="text-xl font-bold mb-4" style="color: var(--cream);">Horarios</h3>
+                    <p style="color: var(--taupe);">Martes a Sábado: 09:00 - 12:30<br>15:00 - 20:30</p>
+                    <p style="color: var(--taupe);">&nbsp;</p>
+                    <p style="color: var(--taupe);">Lunes y Domingos: Cerrado</p>
                 </div>
-                
+
                 <div>
-                    <h3 class="text-xl font-bold mb-4">Contacto</h3>
+                    <h3 class="text-xl font-bold mb-4" style="color: var(--cream);">Contacto</h3>
                     <div class="space-y-3">
-                        <a href="https://wa.me/5493534264629" target="_blank" class="flex items-center text-green-400 hover:text-green-300 transition-colors social-hover">
+                        <a href="https://wa.me/5493534264629" target="_blank" class="flex items-center footer-icon footer-icon--whatsapp">
                             <i class="fab fa-whatsapp text-2xl mr-3"></i>
                             <span>+54 9 3534264629</span>
                         </a>
-                        <a href="https://instagram.com/dami_lovaizaa" target="_blank" class="flex items-center text-pink-400 hover:text-pink-300 transition-colors social-hover">
+                        <a href="https://instagram.com/dami_lovaizaa" target="_blank" class="flex items-center footer-icon footer-icon--instagram">
                             <i class="fab fa-instagram text-2xl mr-3"></i>
                             <span>@dami_lovaizaa</span>
                         </a>
-                        <a href="mailto:damilovaiza@gmail.com" class="flex items-center text-gray-300 hover:text-white transition-colors">
+                        <a href="mailto:damilovaiza@gmail.com" class="flex items-center footer-icon">
                             <i class="fas fa-envelope text-xl mr-3"></i>
                             <span>damilovaiza@gmail.com</span>
                         </a>
                     </div>
                 </div>
             </div>
-            
-            <div class="border-t border-gray-700 mt-8 pt-8 text-center">
-                <p class="text-gray-400">© 2025 Barberia. Todos los derechos reservados.</p>
+
+            <div class="border-t mt-8 pt-8 text-center" style="border-color: rgba(255,255,255,0.08);">
+                <p style="color: var(--taupe-dim);">© 2025 Barbería Damián Lovaiza. Todos los derechos reservados.</p>
             </div>
         </div>
     </footer>
 
     <script type="module">
-        import { API_URL } from './config.js'; // ruta relativa desde index.html
-        console.log(API_URL);
-        // ahora puedes usar API_URL en este script
+        import { API_URL } from './config.js';
         window.apiUrl = API_URL;
     </script>
+
     <script>
         function validarTelefono(telefono) {
-    // Ejemplo: acepta solo números y debe tener entre 8 y 15 dígitos
-    return /^\d{8,15}$/.test(telefono);
-}
+            return /^\d{8,15}$/.test(telefono);
+        }
 
-function validarEmail(email) {
-    // Validación básica de email
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
+        function validarEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
 
-// Mostrar/ocultar el alias según el método de pago elegido
-document.querySelectorAll('input[name="metodo_pago"]').forEach(radio => {
-    radio.addEventListener('change', function() {
-        const cartel = document.getElementById('datosTransferencia');
-        cartel.classList.toggle('hidden', this.value !== 'Transferencia');
-    });
-});
-
-document.getElementById('turnoForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-
-    const nombre = this.querySelector('input[type="text"]').value.trim();
-    const telefono = this.querySelector('input[type="tel"]').value.trim();
-    const email = this.querySelector('input[type="email"]').value.trim();
-    const tipo_turno = this.querySelector('select').value;
-    const fecha = this.querySelector('input[type="date"]').value.trim();
-    const metodo_pago = this.querySelector('input[name="metodo_pago"]:checked').value;
-
-    let mensaje = "";
-    if (!nombre) mensaje += "El nombre es obligatorio.\n";
-    if (!validarTelefono(telefono)) mensaje += "El teléfono debe tener entre 8 y 15 dígitos y solo números.\n";
-    if (!validarEmail(email)) mensaje += "El email no es válido.\n";
-    if (!fecha) mensaje += "Elegí una fecha.\n";
-    if (!horaSeleccionada) mensaje += "Elegí un horario disponible.\n";
-
-    if (mensaje) {
-        alert(mensaje);
-        return;
-    }
-
-    const hora = `${horaSeleccionada}:00`;
-    const apiUrl = window.apiUrl;
-    const submitBtn = this.querySelector('button[type="submit"]');
-    const textoOriginalBtn = submitBtn.textContent;
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Reservando...";
-    mostrarMensaje("", "ok"); // limpiar mensaje previo
-
-    try {
-        const response = await fetch(`${apiUrl}/turnos/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                nombre: nombre,
-                telefono: telefono,
-                email: email,
-                tipo_turno: tipo_turno,
-                fecha: fecha,
-                hora: hora,
-                metodo_pago: metodo_pago
-            })
+        // Mostrar/ocultar el aviso de transferencia según el método de pago elegido
+        document.querySelectorAll('input[name="metodo_pago"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const cartel = document.getElementById('datosTransferencia');
+                cartel.classList.toggle('abierto', this.value === 'Transferencia');
+            });
         });
 
-        if (response.ok) {
-            mostrarMensaje('¡Turno reservado con éxito! Te contactaremos pronto para confirmar.', 'ok');
-            this.reset();
-            horaSeleccionada = null;
-            horariosDiv.innerHTML = "";
-        } else {
-            // El backend devuelve, por ejemplo, 409 si el horario ya fue tomado por otra persona
-            let detalle = 'No se pudo reservar el turno. Intenta nuevamente.';
-            try {
-                const errData = await response.json();
-                if (errData.detail) detalle = errData.detail;
-            } catch (_) {}
-            mostrarMensaje(detalle, 'error');
-            // Si el horario ya no está disponible, refrescamos la lista para reflejarlo
-            if (response.status === 409) generarHorarios();
-        }
-    } catch (error) {
-        mostrarMensaje('No se pudo conectar con el servidor. Intenta nuevamente en unos minutos.', 'error');
-    } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = textoOriginalBtn;
-    }
-});
-    </script>
-    <script>
-        // import { API_URL } from './config.js';
-        // // Validación del formulario
-        // document.getElementById('turnoForm').addEventListener('submit', function(e) {
-        //     e.preventDefault();
-            
-        //     // Validación básica
-        //     const inputs = this.querySelectorAll('input[required]');
-        //     let isValid = true;
-            
-        //     inputs.forEach(input => {
-        //         if (!input.value.trim()) {
-        //             input.style.borderColor = 'red';
-        //             isValid = false;
-        //         } else {
-        //             input.style.borderColor = '#d1d5db';
-        //         }
-        //     });
-            
-        //     if (isValid) {
-        //         alert('¡Turno reservado con éxito! Te contactaremos pronto para confirmar.');
-        //         fetch(`${API_URL}/turnos/`, {
-        //             method: 'POST',
-        //             headers: {
-        //                 'Content-Type': 'application/json'
-        //             },
-        //             body: JSON.stringify({
-        //                 nombre: this.querySelector('input[type="text"]').value.trim(),
-        //                 telefono: this.querySelector('input[type="tel"]').value.trim(),
-        //                 email: this.querySelector('input[type="email"]').value.trim(),
-        //                 tipo_turno: this.querySelector('select').value,
-        //                 fecha: this.querySelector('input[type="date"]').value.trim(),
-        //                 hora: horaSeleccionada,
-        //                 observaciones: this.querySelector('textarea').value.trim()
-        //             })
-        //         }).then(response => {
-        //             if (response.ok) {
-        //                 mostrarMensaje('¡Turno reservado con éxito!', 'ok');
-        //             } else {
-        //                 mostrarMensaje('Error al reservar el turno. Intenta nuevamente.', 'error');
-        //             }
-        //         }).catch(() => {
-        //             mostrarMensaje('No se pudo conectar con el servidor.', 'error');
-        //         });
-        //         this.reset();
-        //     } else {
-        //         alert('Por favor, completa todos los campos requeridos.');
-        //     }
-        // });
-
-
-        // document.getElementById('turnoForm').addEventListener('submit', async function(e) {
-        //     e.preventDefault();
-
-        //     // ...validaciones...
-
-        //     // Ejemplo de integración con backend
-        //     const datos = {
-        //         nombre: nombre,
-        //         telefono: telefono,
-        //         email: email,
-        //         servicio: this.querySelector('select').value,
-        //         fecha: this.querySelector('input[type="date"]').value,
-        //         hora: horaSeleccionada,
-        //         mensaje: this.querySelector('textarea').value
-        //     };
-        
-        //     try {
-        //         const res = await fetch('http://127.0.0.1:8000/turnos/', {
-        //             method: 'POST',
-        //             headers: { 'Content-Type': 'application/json' },
-        //             body: JSON.stringify(datos)
-        //         });
-        //         if (res.ok) {
-        //             alert('¡Turno reservado con éxito!');
-        //             this.reset();
-        //         } else {
-        //             alert('Error al reservar el turno. Intenta nuevamente.');
-        //         }
-        //     } catch (error) {
-        //         alert('No se pudo conectar con el servidor.');
-        //     }
-        // });
-
+        let toastTimeout = null;
         function mostrarMensaje(texto, tipo = "error") {
-            console.log("MOSTRAR MENSAJE FUE LLAMADO CON:", texto, tipo);
             const mensajeReserva = document.getElementById("mensajeReserva");
+            clearTimeout(toastTimeout);
+
             if (!texto) {
-                mensajeReserva.textContent = "";
-                mensajeReserva.style.display = "none";
+                mensajeReserva.classList.remove("toast-visible");
                 return;
             }
+
             mensajeReserva.textContent = texto;
-            mensajeReserva.style.display = "block";
             mensajeReserva.style.textAlign = "center";
-            mensajeReserva.style.marginTop = "16px";
-            mensajeReserva.style.padding = "16px";
-            mensajeReserva.style.borderRadius = "8px";
+            mensajeReserva.style.padding = "16px 20px";
+            mensajeReserva.style.borderRadius = "10px";
             mensajeReserva.style.fontWeight = "600";
-            mensajeReserva.style.fontSize = "1.1rem";
+            mensajeReserva.style.fontSize = "1rem";
             if (tipo === "ok") {
-                mensajeReserva.style.backgroundColor = "#d1fae5";
-                mensajeReserva.style.color = "#065f46";
-                mensajeReserva.style.border = "2px solid #34d399";
+                mensajeReserva.style.backgroundColor = "#1b1613";
+                mensajeReserva.style.color = "#e9c988";
+                mensajeReserva.style.border = "1px solid rgba(198, 156, 79, 0.6)";
             } else {
-                mensajeReserva.style.backgroundColor = "#fee2e2";
-                mensajeReserva.style.color = "#991b1b";
-                mensajeReserva.style.border = "2px solid #f87171";
+                mensajeReserva.style.backgroundColor = "#1b1613";
+                mensajeReserva.style.color = "#e2a3a3";
+                mensajeReserva.style.border = "1px solid rgba(150, 60, 60, 0.6)";
             }
-            mensajeReserva.scrollIntoView({ behavior: "smooth", block: "center" });
+
+            // Forzar reflow para que la transición de entrada se vea siempre, aunque
+            // se muestre un toast justo después de ocultar otro.
+            mensajeReserva.classList.remove("toast-visible");
+            void mensajeReserva.offsetWidth;
+            mensajeReserva.classList.add("toast-visible");
+
+            // Se oculta solo a los 6 segundos (el éxito no hace falta que quede para siempre;
+            // si es un error, le damos más tiempo para que le dé tiempo a leerlo).
+            const duracion = tipo === "ok" ? 6000 : 9000;
+            toastTimeout = setTimeout(() => {
+                mensajeReserva.classList.remove("toast-visible");
+            }, duracion);
         }
+
+        document.getElementById('turnoForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const nombre = this.querySelector('input[type="text"]').value.trim();
+            const telefono = this.querySelector('input[type="tel"]').value.trim();
+            const email = this.querySelector('input[type="email"]').value.trim();
+            const tipo_turno = this.querySelector('select').value;
+            const fecha = this.querySelector('input[type="date"]').value.trim();
+            const metodo_pago = this.querySelector('input[name="metodo_pago"]:checked').value;
+            const observacionesTexto = this.querySelector('#observaciones').value.trim();
+
+            let mensaje = "";
+            if (!nombre) mensaje += "El nombre es obligatorio.\n";
+            if (!validarTelefono(telefono)) mensaje += "El teléfono debe tener entre 8 y 15 dígitos y solo números.\n";
+            if (!validarEmail(email)) mensaje += "El email no es válido.\n";
+            if (!fecha) mensaje += "Elegí una fecha.\n";
+            if (!horaSeleccionada) mensaje += "Elegí un horario disponible.\n";
+
+            if (mensaje) {
+                alert(mensaje);
+                return;
+            }
+
+            const hora = `${horaSeleccionada}:00`;
+            const apiUrl = window.apiUrl;
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const textoOriginalBtn = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Reservando...";
+            mostrarMensaje("", "ok");
+
+            try {
+                const response = await fetch(`${apiUrl}/turnos/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        nombre: nombre,
+                        telefono: telefono,
+                        email: email,
+                        tipo_turno: tipo_turno,
+                        fecha: fecha,
+                        hora: hora,
+                        metodo_pago: metodo_pago,
+                        observaciones: observacionesTexto || null
+                    })
+                });
+
+                if (response.ok) {
+                    this.reset();
+                    horaSeleccionada = null;
+                    horariosDiv.innerHTML = "";
+                    mostrarMensaje('¡Turno reservado con éxito! Te contactaremos pronto para confirmar.', 'ok');
+                } else {
+                    let detalle = 'No se pudo reservar el turno. Intenta nuevamente.';
+                    try {
+                        const errData = await response.json();
+                        if (errData.detail) detalle = errData.detail;
+                    } catch (_) {}
+                    mostrarMensaje(detalle, 'error');
+                    if (response.status === 409) generarHorarios();
+                }
+            } catch (error) {
+                mostrarMensaje('No se pudo conectar con el servidor. Intenta nuevamente en unos minutos.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = textoOriginalBtn;
+            }
+        });
 
         // Smooth scrolling para los links de navegación
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -524,10 +715,24 @@ document.getElementById('turnoForm').addEventListener('submit', async function(e
             }
         });
 
-        
-
-
-
+        // Revelado de secciones al hacer scroll
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const reveals = document.querySelectorAll('.reveal');
+        if (prefersReducedMotion) {
+            reveals.forEach(el => el.classList.add('is-visible'));
+        } else if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.15 });
+            reveals.forEach(el => observer.observe(el));
+        } else {
+            reveals.forEach(el => el.classList.add('is-visible'));
+        }
 
         const fechaInput = document.getElementById("fecha");
         const horariosDiv = document.getElementById("horarios");
@@ -541,94 +746,73 @@ document.getElementById('turnoForm').addEventListener('submit', async function(e
                 return;
             }
             const fecha = new Date(fechaInput.value);
-            const dia = fecha.getUTCDay(); // 0=Domingo, 1=Lunes, ..., 6=Sábado
+            const dia = fecha.getUTCDay();
             if (dia === 0 || dia === 1) {
                 alert("Solo se atiende de martes a sábado.");
                 fechaInput.value = "";
                 horariosDiv.innerHTML = "";
             } else {
-            generarHorarios();
+                generarHorarios();
             }
         });
-    
+
         // Generar horarios disponibles
         async function generarHorarios() {
-            horariosDiv.innerHTML = '<p class="text-gray-400 col-span-full text-center">Cargando horarios...</p>';
+            horariosDiv.innerHTML = '<p class="col-span-full text-center" style="color: var(--taupe-dim);">Cargando horarios...</p>';
             horaSeleccionada = null;
             const horarios = [];
 
-        // Mañana: 09:00 - 12:30
-        for (let h = 9; h <= 12; h++) {
-            for (let m = 0; m < 60; m += 30) {
-                if (!(h === 12 && m > 30)) {
-                    horarios.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
+            for (let h = 9; h <= 12; h++) {
+                for (let m = 0; m < 60; m += 30) {
+                    if (!(h === 12 && m > 30)) {
+                        horarios.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
+                    }
                 }
             }
-        }
 
-        // Tarde: 15:00 - 20:30
-        for (let h = 15; h <= 20; h++) {
-            for (let m = 0; m < 60; m += 30) {
-                if (!(h === 20 && m > 30)) {
-                    horarios.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
+            for (let h = 15; h <= 20; h++) {
+                for (let m = 0; m < 60; m += 30) {
+                    if (!(h === 20 && m > 30)) {
+                        horarios.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
+                    }
                 }
             }
-        }
 
-        // Obtener la fecha seleccionada en formato YYYY-MM-DD
-        const fechaSeleccionada = fechaInput.value;
+            const fechaSeleccionada = fechaInput.value;
 
-        // Traer del backend los horarios que YA están ocupados para esta fecha
-        let horariosOcupados = [];
-        try {
-            const apiUrl = window.apiUrl;
-            const res = await fetch(`${apiUrl}/turnos/ocupados?fecha=${fechaSeleccionada}`);
-            if (res.ok) {
-                const data = await res.json();
-                horariosOcupados = data.horarios || [];
+            let horariosOcupados = [];
+            try {
+                const apiUrl = window.apiUrl;
+                const res = await fetch(`${apiUrl}/turnos/ocupados?fecha=${fechaSeleccionada}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    horariosOcupados = data.horarios || [];
+                }
+            } catch (err) {
+                console.error("No se pudieron cargar los horarios ocupados:", err);
             }
-        } catch (err) {
-            console.error("No se pudieron cargar los horarios ocupados:", err);
-        }
 
-        horariosDiv.innerHTML = "";
+            horariosDiv.innerHTML = "";
 
-        // Crear botones de horario, excluyendo los reservados
-        horarios.forEach(hora => {
-            // No mostrar si ese horario ya está ocupado para la fecha elegida
-            if (horariosOcupados.includes(hora)) return;
+            horarios.forEach(hora => {
+                if (horariosOcupados.includes(hora)) return;
 
-            const btn = document.createElement("button");
-            btn.textContent = hora;
-            btn.type = "button";
-            btn.className = 
-                "px-4 py-2 rounded-xl border border-gray-300 text-gray-700 hover:bg-blue-500 hover:text-white transition " +
-                "focus:outline-none focus:ring-2 focus:ring-blue-400";
+                const btn = document.createElement("button");
+                btn.textContent = hora;
+                btn.type = "button";
+                btn.className = "horario-btn";
 
-            btn.addEventListener("click", () => {
-                // Desmarcar el anterior
-                document.querySelectorAll("#horarios button").forEach(b => {
-                    b.classList.remove("bg-blue-500", "text-white");
-                    b.classList.add("border-gray-300", "text-gray-700");
+                btn.addEventListener("click", () => {
+                    document.querySelectorAll("#horarios button").forEach(b => {
+                        b.classList.remove("horario-btn--selected");
+                    });
+                    btn.classList.add("horario-btn--selected");
+                    horaSeleccionada = hora;
                 });
 
-                // Marcar el seleccionado
-                btn.classList.remove("border-gray-300", "text-gray-700");
-                btn.classList.add("bg-blue-500", "text-white");
-                
-                horaSeleccionada = hora;
-                console.log("Hora seleccionada:", horaSeleccionada);
+                horariosDiv.appendChild(btn);
             });
-        
-            horariosDiv.appendChild(btn);
-        });
-    }
-
-
-
-
-    
+        }
     </script>
 </body>
-
 </html>
