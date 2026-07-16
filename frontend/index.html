@@ -528,9 +528,9 @@
 
                 <div>
                     <h3 class="text-xl font-bold mb-4" style="color: var(--cream);">Horarios</h3>
-                    <p style="color: var(--taupe);">Martes a Sábado: 09:00 - 12:30<br>15:00 - 20:30</p>
+                    <p style="color: var(--taupe);">Lunes a Sábado: 09:00 - 12:30<br>15:00 - 20:30</p>
                     <p style="color: var(--taupe);">&nbsp;</p>
-                    <p style="color: var(--taupe);">Lunes y Domingos: Cerrado</p>
+                    <p style="color: var(--taupe);">Domingos: Cerrado</p>
                 </div>
 
                 <div>
@@ -738,17 +738,35 @@
         const horariosDiv = document.getElementById("horarios");
         let horaSeleccionada = null;
 
-        // Bloquear domingos y lunes
+        // La fecha de "hoy" en formato YYYY-MM-DD, según la hora local del navegador
+        function hoyLocalISO() {
+            const ahora = new Date();
+            const offset = ahora.getTimezoneOffset() * 60000;
+            return new Date(ahora - offset).toISOString().split("T")[0];
+        }
+
+        // No dejar elegir un día anterior a hoy en el selector nativo del navegador
+        fechaInput.min = hoyLocalISO();
+
+        // Bloquear domingos (día de descanso) y cualquier fecha ya pasada
         fechaInput.addEventListener("input", () => {
             if (!fechaInput.value) {
                 horariosDiv.innerHTML = "";
                 horaSeleccionada = null;
                 return;
             }
+
+            if (fechaInput.value < hoyLocalISO()) {
+                alert("Elegí una fecha a partir de hoy, no se pueden sacar turnos en fechas pasadas.");
+                fechaInput.value = "";
+                horariosDiv.innerHTML = "";
+                return;
+            }
+
             const fecha = new Date(fechaInput.value);
-            const dia = fecha.getUTCDay();
-            if (dia === 0 || dia === 1) {
-                alert("Solo se atiende de martes a sábado.");
+            const dia = fecha.getUTCDay(); // 0 = Domingo
+            if (dia === 0) {
+                alert("Los domingos la barbería está cerrada. Atendemos de lunes a sábado.");
                 fechaInput.value = "";
                 horariosDiv.innerHTML = "";
             } else {
